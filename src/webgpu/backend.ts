@@ -1,5 +1,5 @@
 import { WebGpuTexture } from "./texture";
-import { ShaderPipeline } from "./pipeline";
+import { createCompiledShader } from "./pipeline";
 
 import type { Backend, CompilerShader, ShaderDescriptor, TextureConfig } from "../types";
 import { createPreviewRenderer, PreviewRenderer } from "./preview-renderer";
@@ -53,7 +53,7 @@ export class WebGPUBackend implements Backend {
     }
 
     async compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader> {
-        return new ShaderPipeline(this.#device, descriptor);
+        return createCompiledShader(this.#device, descriptor);
     }
 
     renderTexture(texture: WebGpuTexture, canvas: HTMLCanvasElement) {

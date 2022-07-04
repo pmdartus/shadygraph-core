@@ -29,192 +29,158 @@ interface ShaderPipelineState {
 const TEXTURE_TYPE: TextureType = 'color';
 const TEXTURE_SIZE = 512;
 
-export class ShaderPipeline implements CompilerShader {
-    #device: GPUDevice;
-    #shader: ShaderDescriptor;
-    #state: ShaderPipelineState | null;
+export async function createCompiledShader(
+    device: GPUDevice,
+    shader: ShaderDescriptor,
+): Promise<CompilerShader> {
+    const { id } = shader;
 
-    constructor(device: GPUDevice, shader: ShaderDescriptor) {
-        this.#device = device;
-        this.#shader = shader;
-        this.#state = null!;
-    }
+    const vertexShaderModule = await createShaderModule(device, {
+        label: `ShaderModule:Vertex:${id}`,
+        code: VERTEX_SHADER_CODE,
+    });
 
-    get shader() {
-        return this.#shader;
-    }
+    const fragmentShaderModule = await createShaderModule(device, {
+        label: `ShaderModule:Fragment:${id}`,
+        code: shader.source,
+    });
 
-    async #getState() {
-        if (this.#state !== null) {
-            return this.#state;
-        }
+    const propertiesBuffer = new PropertiesBuffer(device, shader);
 
-        const device = this.#device;
-        const { shader } = this;
-        const { id } = shader;
-
-        const vertexShaderModule = await createShaderModule(device, {
-            label: `ShaderModule:Vertex:${id}`,
-            code: VERTEX_SHADER_CODE,
-        });
-
-        const fragmentShaderModule = await createShaderModule(device, {
-            label: `ShaderModule:Fragment:${id}`,
-            code: shader.source,
-        });
-
-        const properties = new PropertiesBuffer(device, shader);
-
-        const propertiesBindGroupLayout = device.createBindGroupLayout({
-            label: `BindGroupLayout:Properties:${id}`,
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    buffer: {
-                        type: 'uniform',
-                    },
-                },
-            ],
-        });
-
-        const propertiesBindGroup = device.createBindGroup({
-            label: `BindGroup:Properties:${id}`,
-            layout: propertiesBindGroupLayout,
-            entries: [
-                {
-                    binding: 0,
-                    resource: {
-                        buffer: properties.buffer,
-                    },
-                },
-            ],
-        });
-
-        const inputs = Object.keys(shader.inputs).map((inputId) =>
-            createShaderInput(device, shader, inputId)
-        );
-        const outputs = Object.keys(shader.outputs).map((outputId) =>
-            createShaderOutput(device, shader, outputId)
-        );
-
-        const pipelineLayout = device.createPipelineLayout({
-            label: `PipelineLayout:${id}`,
-            bindGroupLayouts: [propertiesBindGroupLayout, ...inputs.map((input) => input.layout)],
-        });
-
-        const bindGroups: GPUBindGroup[] = [
-            propertiesBindGroup,
-            ...inputs.map((input) => input.bindGroup),
-        ];
-
-        const pipeline = await device.createRenderPipelineAsync({
-            label: `RenderPipeline:${id}`,
-            layout: pipelineLayout,
-            vertex: {
-                module: vertexShaderModule,
-                entryPoint: 'main',
-            },
-            fragment: {
-                module: fragmentShaderModule,
-                entryPoint: 'main',
-                targets: [
-                    {
-                        format: 'rgba8unorm',
-                    },
-                ],
-            },
-            primitive: {
-                topology: 'triangle-list',
-            },
-        });
-
-        return (this.#state = {
-            pipeline,
-            properties,
-            inputs,
-            outputs,
-            bindGroups,
-        });
-    }
-
-    destroy() {
-        const state = this.#state;
-
-        if (state !== null) {
-            state.properties.destroy();
-            state.inputs.forEach((input) => input.texture.destroy());
-            state.outputs.forEach((output) => output.texture.destroy());
-
-            this.#state = null;
-        }
-    }
-
-    async render(
-        properties: Record<string, Value>,
-        inputs: Record<string, WebGpuTexture>,
-        outputs: Record<string, WebGpuTexture>
-    ): Promise<void> {
-        const device = this.#device;
-        const state = await this.#getState();
-
-        state.properties.writePropertiesBuffer(properties);
-
-        const encoder = device.createCommandEncoder();
-        {
-            for (const input of state.inputs) {
-                const inputTexture = inputs[input.id];
-
-                if (inputTexture !== undefined) {
-                    // If present copy the input texture to the pipeline texture.
-                    //
-                    // TODO: Do we really need to copy the, could we plug it into the pipeline directly?
-                    // Wouldn't it be faster this way?
-                    WebGpuTexture.copyTextureToTexture(encoder, inputTexture, input.texture);
-                } else {
-                    // Otherwise clear the pipeline texture to remove the previous result.
-                    input.texture.clear();
-                }
-            }
-
-            const renderPass = encoder.beginRenderPass({
-                colorAttachments: state.outputs.map((output) => ({
-                    view: output.texture.view,
-                    loadValue: { r: 0, g: 0, b: 0, a: 1 },
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                })),
-            });
-
+    const propertiesBindGroupLayout = device.createBindGroupLayout({
+        label: `BindGroupLayout:Properties:${id}`,
+        entries: [
             {
-                renderPass.setPipeline(state.pipeline);
-                for (let i = 0; i < state.bindGroups.length; i++) {
-                    renderPass.setBindGroup(i, state.bindGroups[i]);
+                binding: 0,
+                visibility: GPUShaderStage.FRAGMENT,
+                buffer: {
+                    type: 'uniform',
+                },
+            },
+        ],
+    });
+
+    const propertiesBindGroup = device.createBindGroup({
+        label: `BindGroup:Properties:${id}`,
+        layout: propertiesBindGroupLayout,
+        entries: [
+            {
+                binding: 0,
+                resource: {
+                    buffer: propertiesBuffer.buffer,
+                },
+            },
+        ],
+    });
+
+    const pipelineInputs = Object.keys(shader.inputs).map((inputId) =>
+        createShaderInput(device, shader, inputId),
+    );
+    const pipelineOutputs = Object.keys(shader.outputs).map((outputId) =>
+        createShaderOutput(device, shader, outputId),
+    );
+
+    const pipelineLayout = device.createPipelineLayout({
+        label: `PipelineLayout:${id}`,
+        bindGroupLayouts: [propertiesBindGroupLayout, ...pipelineInputs.map((input) => input.layout)],
+    });
+
+    const bindGroups: GPUBindGroup[] = [
+        propertiesBindGroup,
+        ...pipelineInputs.map((input) => input.bindGroup),
+    ];
+
+    const pipeline = await device.createRenderPipelineAsync({
+        label: `RenderPipeline:${id}`,
+        layout: pipelineLayout,
+        vertex: {
+            module: vertexShaderModule,
+            entryPoint: 'main',
+        },
+        fragment: {
+            module: fragmentShaderModule,
+            entryPoint: 'main',
+            targets: [
+                {
+                    format: 'rgba8unorm',
+                },
+            ],
+        },
+        primitive: {
+            topology: 'triangle-list',
+        },
+    });
+
+    return {
+        async render(
+            properties: Record<string, Value>,
+            inputs: Record<string, WebGpuTexture>,
+            outputs: Record<string, WebGpuTexture>,
+        ): Promise<void> {    
+            propertiesBuffer.writePropertiesBuffer(properties);
+    
+            const encoder = device.createCommandEncoder();
+            {
+                for (const input of pipelineInputs) {
+                    const inputTexture = inputs[input.id];
+    
+                    if (inputTexture !== undefined) {
+                        // If present copy the input texture to the pipeline texture.
+                        //
+                        // TODO: Do we really need to copy the, could we plug it into the pipeline directly?
+                        // Wouldn't it be faster this way?
+                        WebGpuTexture.copyTextureToTexture(encoder, inputTexture, input.texture);
+                    } else {
+                        // Otherwise clear the pipeline texture to remove the previous result.
+                        input.texture.clear();
+                    }
                 }
-                renderPass.draw(6, 1, 0, 0);
-                renderPass.end();
-            }
-
-            for (const output of state.outputs) {
-                const outputTexture = outputs[output.id];
-                if (outputTexture === undefined) {
-                    throw new Error(`Output texture "${output.id}" missing.`);
+    
+                const renderPass = encoder.beginRenderPass({
+                    colorAttachments: pipelineOutputs.map((output) => ({
+                        view: output.texture.view,
+                        loadValue: { r: 0, g: 0, b: 0, a: 1 },
+                        loadOp: 'clear',
+                        storeOp: 'store',
+                    })),
+                });
+    
+                {
+                    renderPass.setPipeline(pipeline);
+                    for (let i = 0; i < bindGroups.length; i++) {
+                        renderPass.setBindGroup(i, bindGroups[i]);
+                    }
+                    renderPass.draw(6, 1, 0, 0);
+                    renderPass.end();
                 }
-
-                WebGpuTexture.copyTextureToTexture(encoder, output.texture, outputTexture);
+    
+                for (const output of pipelineOutputs) {
+                    const outputTexture = outputs[output.id];
+                    if (outputTexture === undefined) {
+                        throw new Error(`Output texture "${output.id}" missing.`);
+                    }
+    
+                    WebGpuTexture.copyTextureToTexture(encoder, output.texture, outputTexture);
+                }
             }
-        }
+    
+            const command = encoder.finish();
+    
+            device.queue.submit([command]);
+        },
 
-        const command = encoder.finish();
-
-        device.queue.submit([command]);
+        destroy() {
+            propertiesBuffer.destroy();
+            pipelineInputs.forEach((input) => input.texture.destroy());
+            pipelineOutputs.forEach((output) => output.texture.destroy());
+        },
     }
 }
 
 function createShaderInput(
     device: GPUDevice,
     shader: ShaderDescriptor,
-    inputId: string
+    inputId: string,
 ): ShaderPipelineInput {
     const { id } = shader;
 
@@ -276,7 +242,7 @@ function createShaderInput(
 function createShaderOutput(
     device: GPUDevice,
     shader: ShaderDescriptor,
-    outputId: string
+    outputId: string,
 ): ShaderPipelineOutput {
     const { id } = shader;
 

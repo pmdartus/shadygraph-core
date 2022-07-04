@@ -10,7 +10,7 @@ const compiledShader = await backend.compileShader(UNIFORM_COLOR);
 async function run() {
     document.querySelectorAll('canvas').forEach((canvas) => canvas.remove());
 
-    const entries = new Array(100).fill(null).map((_, i) => {
+    const entries = new Array(1000).fill(null).map((_, i) => {
         const canvas = document.createElement('canvas');
         canvas.style.width = `30px`;
         document.body.appendChild(canvas);
@@ -30,7 +30,7 @@ async function run() {
             const inputs = {};
             const outputs = { output };
 
-            await compiledShader.render(properties, inputs, outputs);
+            compiledShader.render(properties, inputs, outputs);
             backend.renderTexture(output, canvas);
         }),
     );

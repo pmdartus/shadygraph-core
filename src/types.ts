@@ -120,7 +120,7 @@ export interface CompilerShader {
         properties: Record<string, Value>,
         inputs: Record<string, Texture>,
         outputs: Record<string, Texture>,
-    ): Promise<void>;
+    ): void;
     destroy(): void;
 }
 
