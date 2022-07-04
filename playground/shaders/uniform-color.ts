@@ -11,7 +11,7 @@ const UNIFORM_COLOR_SOURCE = /* wgsl */ `
 
     @group(0) @binding(0) var<uniform> config: UniformColorConfig;
 
-    @stage(fragment)
+    @fragment
     fn main(
         @location(0) coordinate: vec2<f32>
     ) -> UniformColorOutput {

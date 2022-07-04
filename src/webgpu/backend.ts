@@ -1,26 +1,49 @@
-import { Backend } from "../types";
+import { WebGpuTexture } from "./texture";
+import { ShaderPipeline } from "./pipeline";
 
-export async function createWebGPUBackend(): Promise<Backend> {
-    if (!('gpu' in navigator)) {
-        throw new Error('GPU not supported in this browser.');
+import type { Backend, CompilerShader, ShaderDescriptor, TextureConfig } from "../types";
+
+interface WebGPUBackendConfig {
+    device: GPUDevice, adapter: GPUAdapter
+}
+
+export class WebGPUBackend implements Backend {
+    #adapter: GPUAdapter;
+    #device: GPUDevice;
+
+    constructor(config: WebGPUBackendConfig) {
+        this.#device = config.device;
+        this.#adapter = config.adapter;
     }
 
-    const adapter = await navigator.gpu.requestAdapter({
-        powerPreference: 'high-performance',
-    });
+    static async create(): Promise<WebGPUBackend> {
+        if (!('gpu' in navigator)) {
+            throw new Error('GPU not supported in this browser.');
+        }
+        
+        const adapter = await navigator.gpu.requestAdapter({
+            powerPreference: 'high-performance',
+        });
+        
+        if (adapter === null) {
+            throw new Error('Failed to instantiate GPU adapter.');
+        }
 
-    if (adapter === null) {
-        throw new Error('Failed to instantiate GPU adapter.');
+        const device = await adapter.requestDevice();
+
+        return new WebGPUBackend({
+            device,
+            adapter
+        });
     }
 
-    const device = await adapter.requestDevice();
+    async compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader> {
+        return new ShaderPipeline(this.#device, descriptor);
+    }
 
-    return {
-        async compileShader(descriptor) {
-            return {
-                success: true,
-                shader: {},
-            };
-        },
-    };
+    createTexture(config: TextureConfig): WebGpuTexture {
+        return new WebGpuTexture(this.#device, {
+            ...config,
+        });
+    }
 }

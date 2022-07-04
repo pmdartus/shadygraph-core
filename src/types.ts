@@ -115,17 +115,29 @@ export interface Graph {
     deleteEdge(id: string): Edge | undefined;
 }
 
-export interface CompilerShader {}
+export interface CompilerShader {
+    render(
+        properties: Record<string, Value>,
+        inputs: Record<string, Texture>,
+        outputs: Record<string, Texture>,
+    ): Promise<void>;
+    destroy(): void;
+}
 
-export interface ShaderCompilationError {}
+export interface TextureConfig {
+    type: TextureType;
+    size: number;
+}
+
+export interface Texture {
+    readonly type: TextureType;
+    readonly size: number;
+    getData(): Promise<ArrayBuffer>;
+}
 
 export interface Backend {
-    compileShader(
-        descriptor: ShaderDescriptor,
-    ): Promise<
-        | { success: true; shader: CompilerShader }
-        | { success: false; errors: ShaderCompilationError[] }
-    >;
+    compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader>;
+    createTexture(config: TextureConfig): Texture;
 }
 
 export interface EngineConfig {
@@ -135,6 +147,6 @@ export interface EngineConfig {
 
 export interface Engine {
     registerShader(descriptor: ShaderDescriptor): void;
-    
+
     createGraph(): Graph;
 }
