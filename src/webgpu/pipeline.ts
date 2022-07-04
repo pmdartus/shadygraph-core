@@ -208,7 +208,6 @@ export class ShaderPipeline implements CompilerShader {
         const command = encoder.finish();
 
         device.queue.submit([command]);
-        await device.queue.onSubmittedWorkDone();
     }
 }
 

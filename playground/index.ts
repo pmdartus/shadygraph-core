@@ -31,10 +31,11 @@ async function run() {
             const outputs = { output };
 
             await compiledShader.render(properties, inputs, outputs);
-            return textureToCanvas(output, canvas);
+            backend.renderTexture(output, canvas);
         }),
     );
-
+    
+    await backend.waitUntilDone();
     const end = performance.now();
 
     button.textContent = `Run (${Math.round(end - start)}ms)`;

@@ -24,7 +24,7 @@ export class WebGpuTexture implements Texture {
 
         // Always enable COPY_SRC to be capable to retrieve the rendered content via
         // `WebGpuTexture.getData`.
-        usage = GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
+        usage = GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
         const format = type === 'color' ? 'rgba8unorm' : 'r8unorm';
 
         this.#texture = device.createTexture({
@@ -53,6 +53,10 @@ export class WebGpuTexture implements Texture {
 
     get size(): number {
         return this.#size;
+    }
+
+    get gpuTexture(): GPUTexture {
+        return this.#texture;
     }
 
     get #extent3DStrict(): GPUExtent3DStrict {
