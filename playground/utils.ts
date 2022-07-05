@@ -1,14 +1,12 @@
-import { Texture } from '../src/types';
-
-export async function textureToCanvas(texture: Texture, canvas: HTMLCanvasElement): Promise<void> {
-    const { size: width, size: height } = texture;
+export function createPreviewCanvas() {
+    const canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
     
-    const data = await texture.getData();
-    const imageData = new ImageData(new Uint8ClampedArray(data), width, height);
+    canvas.width = 512;
+    canvas.height = 512;
 
-    canvas.width = width;
-    canvas.height = height;
+    canvas.style.width = `30px`;
+    canvas.style.height = `30px`;
 
-    const ctx = canvas.getContext('2d')!;
-    ctx.putImageData(imageData, 0, 0);
+    return canvas;
 }

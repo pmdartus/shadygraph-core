@@ -1,49 +1,68 @@
 import { WebGPUBackend, createFloat3 } from '../src/main';
 
+import { createPreviewCanvas } from './utils';
 import { UNIFORM_COLOR } from './shaders/uniform-color';
-import { textureToCanvas } from './utils';
-
-const backend = await WebGPUBackend.create();
-
-const compiledShader = await backend.compileShader(UNIFORM_COLOR);
-
-async function run() {
-    document.querySelectorAll('canvas').forEach((canvas) => canvas.remove());
-
-    const entries = new Array(1000).fill(null).map((_, i) => {
-        const canvas = document.createElement('canvas');
-        canvas.style.width = `30px`;
-        document.body.appendChild(canvas);
-
-        return {
-            color: createFloat3([Math.random(), Math.random(), Math.random()]),
-            output: backend.createTexture({ size: 512, type: 'color' }),
-            canvas,
-        };
-    });
-
-    const start = performance.now();
-
-    await Promise.all(
-        entries.map(async ({ canvas, color, output }) => {
-            const properties = { color };
-            const inputs = {};
-            const outputs = { output };
-
-            compiledShader.render(properties, inputs, outputs);
-            backend.renderTexture(output, canvas);
-        }),
-    );
-    
-    await backend.waitUntilDone();
-    const end = performance.now();
-
-    button.textContent = `Run (${Math.round(end - start)}ms)`;
-}
+import { INVERT } from './shaders/invert';
 
 const button = document.createElement('button');
 document.body.appendChild(button);
 button.textContent = 'Run';
 button.addEventListener('click', run);
+
+const backend = await WebGPUBackend.create();
+
+const uniformShader = await backend.compileShader(UNIFORM_COLOR);
+const invertShader = await backend.compileShader(INVERT);
+
+const uniformNode = {
+    shader: uniformShader,
+    canvas: createPreviewCanvas(),
+    properties: {
+        color: createFloat3([Math.random(), Math.random(), Math.random()]),
+    },
+    inputs: {},
+    outputs: {
+        output: backend.createTexture({ size: 512, type: 'color' }),
+    },
+};
+
+let currentOutput = uniformNode.outputs.output;
+
+const entries = new Array(1000).fill(null).map((_, i) => {
+    const invertOutput = backend.createTexture({ size: 512, type: 'color' });
+
+    const invertNode = {
+        shader: invertShader,
+        canvas: createPreviewCanvas(),
+        properties: {
+            enabled: true,
+        },
+        inputs: {
+            input: currentOutput,
+        },
+        outputs: {
+            output: invertOutput,
+        }
+    };
+
+    currentOutput = invertOutput;
+    return invertNode;
+});
+
+const nodes = [uniformNode, ...entries];
+
+async function run() {
+    const start = performance.now();
+
+    for (const node of nodes) {
+        node.shader.render(node.properties as any, node.inputs, node.outputs);
+        backend.renderTexture(node.outputs.output, node.canvas);
+    }
+
+    await backend.waitUntilDone();
+    const end = performance.now();
+
+    button.textContent = `Run (${Math.round(end - start)}ms)`;
+}
 
 run();

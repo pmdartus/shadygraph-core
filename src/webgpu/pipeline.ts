@@ -112,11 +112,11 @@ export async function createCompiledShader(
     });
 
     return {
-        async render(
+        render(
             properties: Record<string, Value>,
             inputs: Record<string, WebGpuTexture>,
             outputs: Record<string, WebGpuTexture>,
-        ): Promise<void> {    
+        ): void {    
             propertiesBuffer.writePropertiesBuffer(properties);
     
             const encoder = device.createCommandEncoder();
