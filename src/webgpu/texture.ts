@@ -15,18 +15,19 @@ export class WebGpuTexture implements Texture {
 
     constructor(
         device: GPUDevice,
-        { label, size, usage, type = 'color' }: WebGPUTextureConfig
+        {
+            label,
+            size,
+            usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT,
+            type = 'color',
+        }: WebGPUTextureConfig,
     ) {
         this.#device = device;
         this.#label = label;
         this.#type = type;
         this.#size = size;
 
-        // Always enable COPY_SRC to be capable to retrieve the rendered content via
-        // `WebGpuTexture.getData`.
-        usage = GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
         const format = type === 'color' ? 'rgba8unorm' : 'r8unorm';
-
         this.#texture = device.createTexture({
             label,
             size: { width: size, height: size },
@@ -81,7 +82,7 @@ export class WebGpuTexture implements Texture {
         encoder.copyTextureToBuffer(
             { texture: this.#texture },
             { buffer, bytesPerRow: size * bytesPerPixel, rowsPerImage: size },
-            this.#extent3DStrict
+            this.#extent3DStrict,
         );
         this.#device.queue.submit([encoder.finish()]);
 
@@ -101,23 +102,11 @@ export class WebGpuTexture implements Texture {
             { texture: this.#texture },
             new ArrayBuffer(0),
             { bytesPerRow: size * bytesPerPixel, rowsPerImage: size },
-            this.#extent3DStrict
+            this.#extent3DStrict,
         );
     }
 
     destroy() {
         this.#texture.destroy();
-    }
-
-    static copyTextureToTexture(
-        encoder: GPUCommandEncoder,
-        source: WebGpuTexture,
-        destination: WebGpuTexture
-    ) {
-        encoder.copyTextureToTexture(
-            { texture: source.#texture },
-            { texture: destination.#texture },
-            source.#extent3DStrict
-        );
     }
 }

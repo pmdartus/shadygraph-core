@@ -85,11 +85,6 @@ export async function createCompiledShader(
         bindGroupLayouts: [propertiesBindGroupLayout, ...pipelineInputs.map((input) => input.layout)],
     });
 
-    const bindGroups: GPUBindGroup[] = [
-        propertiesBindGroup,
-        ...pipelineInputs.map((input) => input.bindGroup),
-    ];
-
     const pipeline = await device.createRenderPipelineAsync({
         label: `RenderPipeline:${id}`,
         layout: pipelineLayout,
@@ -121,24 +116,10 @@ export async function createCompiledShader(
     
             const encoder = device.createCommandEncoder();
             {
-                for (const input of pipelineInputs) {
-                    const inputTexture = inputs[input.id];
-    
-                    if (inputTexture !== undefined) {
-                        // If present copy the input texture to the pipeline texture.
-                        //
-                        // TODO: Do we really need to copy the, could we plug it into the pipeline directly?
-                        // Wouldn't it be faster this way?
-                        WebGpuTexture.copyTextureToTexture(encoder, inputTexture, input.texture);
-                    } else {
-                        // Otherwise clear the pipeline texture to remove the previous result.
-                        input.texture.clear();
-                    }
-                }
-    
+
                 const renderPass = encoder.beginRenderPass({
                     colorAttachments: pipelineOutputs.map((output) => ({
-                        view: output.texture.view,
+                        view: outputs[output.id].view,
                         loadValue: { r: 0, g: 0, b: 0, a: 1 },
                         loadOp: 'clear',
                         storeOp: 'store',
@@ -147,20 +128,24 @@ export async function createCompiledShader(
     
                 {
                     renderPass.setPipeline(pipeline);
-                    for (let i = 0; i < bindGroups.length; i++) {
-                        renderPass.setBindGroup(i, bindGroups[i]);
+                    renderPass.setBindGroup(0, propertiesBindGroup);
+                    for (let i = 0; i < pipelineInputs.length; i++) {
+                        renderPass.setBindGroup(i + 1, device.createBindGroup({
+                            layout: pipelineInputs[i].layout,
+                            entries: [
+                                {
+                                    binding: 0,
+                                    resource: inputs[pipelineInputs[i].id].view,
+                                },
+                                {
+                                    binding: 1,
+                                    resource: pipelineInputs[i].sampler,
+                                },
+                            ]
+                        }));
                     }
                     renderPass.draw(6, 1, 0, 0);
                     renderPass.end();
-                }
-    
-                for (const output of pipelineOutputs) {
-                    const outputTexture = outputs[output.id];
-                    if (outputTexture === undefined) {
-                        throw new Error(`Output texture "${output.id}" missing.`);
-                    }
-    
-                    WebGpuTexture.copyTextureToTexture(encoder, output.texture, outputTexture);
                 }
             }
     

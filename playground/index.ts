@@ -18,7 +18,7 @@ const uniformNode = {
     shader: uniformShader,
     canvas: createPreviewCanvas(),
     properties: {
-        color: createFloat3([Math.random(), Math.random(), Math.random()]),
+        get color() {return  createFloat3([Math.random(), Math.random(), Math.random()]) },
     },
     inputs: {},
     outputs: {
@@ -28,7 +28,7 @@ const uniformNode = {
 
 let currentOutput = uniformNode.outputs.output;
 
-const entries = new Array(1000).fill(null).map((_, i) => {
+const entries = new Array(250).fill(null).map((_, i) => {
     const invertOutput = backend.createTexture({ size: 512, type: 'color' });
 
     const invertNode = {
