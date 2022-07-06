@@ -92,6 +92,8 @@ export function createNode(config: NodeInternalConfig): Node {
         get isDirty() {
             return isDirty;
         },
-        async renderNode() {},
+        async renderNode() {
+            // TODO
+        },
     };
 }
