@@ -1,21 +1,29 @@
 {
-  "name": "shadygraph-attempt2",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "lint": "eslint .",
-    "start": "vite ./playground"
-  },
-  "keywords": [],
-  "author": "Pierre-Marie Dartus <pm@dartus.fr>",
-  "license": "MIT",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "@typescript-eslint/parser": "^5.30.5",
-    "@webgpu/types": "^0.1.20",
-    "eslint": "^8.19.0",
-    "typescript": "^4.7.4",
-    "vite": "^2.9.13"
-  }
+    "name": "shadygraph-attempt2",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "prepare": "husky install",
+        "lint": "eslint .",
+        "format": "prettier --write --ignore-unknown .",
+        "start": "vite ./playground"
+    },
+    "keywords": [],
+    "author": "Pierre-Marie Dartus <pm@dartus.fr>",
+    "license": "MIT",
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.30.5",
+        "@typescript-eslint/parser": "^5.30.5",
+        "@webgpu/types": "^0.1.20",
+        "eslint": "^8.19.0",
+        "husky": "^8.0.1",
+        "lint-staged": "^13.0.3",
+        "prettier": "^2.7.1",
+        "typescript": "^4.7.4",
+        "vite": "^2.9.13"
+    },
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    }
 }

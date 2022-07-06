@@ -18,7 +18,9 @@ const uniformNode = {
     shader: uniformShader,
     canvas: createPreviewCanvas(),
     properties: {
-        get color() {return  createFloat3([Math.random(), Math.random(), Math.random()]) },
+        get color() {
+            return createFloat3([Math.random(), Math.random(), Math.random()]);
+        },
     },
     inputs: {},
     outputs: {
@@ -42,7 +44,7 @@ const entries = new Array(1000).fill(null).map(() => {
         },
         outputs: {
             output: invertOutput,
-        }
+        },
     };
 
     currentOutput = invertOutput;

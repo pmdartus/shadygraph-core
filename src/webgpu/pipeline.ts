@@ -175,10 +175,12 @@ function getShaderSource(shader: ShaderDescriptor): string {
 
     const structBinding = wgsl`@group(0) @binding(0) var<uniform> config: Config;`;
 
-    const inputsBindings = Object.keys(shader.inputs).map((key, index) => wgsl`
+    const inputsBindings = Object.keys(shader.inputs).map(
+        (key, index) => wgsl`
         @group(${index + 1}) @binding(0) var ${key}_texture: texture_2d<f32>;
         @group(${index + 1}) @binding(1) var ${key}_sampler: sampler;
-    `)
+    `,
+    );
 
     const outputStruct = wgsl`
         struct Output {

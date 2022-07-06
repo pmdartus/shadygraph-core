@@ -1,11 +1,12 @@
-import { WebGpuTexture } from "./texture";
-import { createCompiledShader } from "./pipeline";
+import { WebGpuTexture } from './texture';
+import { createCompiledShader } from './pipeline';
 
-import type { Backend, CompilerShader, ShaderDescriptor, TextureConfig } from "../types";
-import { createPreviewRenderer, PreviewRenderer } from "./preview-renderer";
+import type { Backend, CompilerShader, ShaderDescriptor, TextureConfig } from '../types';
+import { createPreviewRenderer, PreviewRenderer } from './preview-renderer';
 
 interface WebGPUBackendConfig {
-    device: GPUDevice, adapter: GPUAdapter
+    device: GPUDevice;
+    adapter: GPUAdapter;
 }
 
 export class WebGPUBackend implements Backend {
@@ -29,11 +30,11 @@ export class WebGPUBackend implements Backend {
         if (!('gpu' in navigator)) {
             throw new Error('GPU not supported in this browser.');
         }
-        
+
         const adapter = await navigator.gpu.requestAdapter({
             powerPreference: 'high-performance',
         });
-        
+
         if (adapter === null) {
             throw new Error('Failed to instantiate GPU adapter.');
         }
@@ -42,10 +43,10 @@ export class WebGPUBackend implements Backend {
 
         return new WebGPUBackend({
             device,
-            adapter
+            adapter,
         });
     }
-    
+
     createTexture(config: TextureConfig): WebGpuTexture {
         return new WebGpuTexture(this.#device, {
             ...config,
@@ -58,22 +59,22 @@ export class WebGPUBackend implements Backend {
 
     renderTexture(texture: WebGpuTexture, canvas: HTMLCanvasElement) {
         let context = this.#canvasContext.get(canvas);
-        
+
         if (context === undefined) {
             context = canvas.getContext('webgpu')!;
             this.#canvasContext.set(canvas, context);
-            
+
             context.configure({
                 device: this.#device,
                 format: this.#canvasTextureFormat,
-                alphaMode: 'opaque'
+                alphaMode: 'opaque',
             });
         }
 
         this.#previewRenderer.render({
             source: texture.gpuTexture,
             target: context.getCurrentTexture(),
-        })
+        });
     }
 
     waitUntilDone(): Promise<void> {

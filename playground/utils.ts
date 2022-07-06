@@ -1,7 +1,7 @@
 export function createPreviewCanvas() {
     const canvas = document.createElement('canvas');
     document.body.appendChild(canvas);
-    
+
     canvas.width = 512;
     canvas.height = 512;
 

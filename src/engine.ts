@@ -5,12 +5,14 @@ import type { CompilerShader, Engine, EngineConfig, ShaderDescriptor } from './t
 export function createEngine(config: EngineConfig): Engine {
     const { shaders } = config;
 
-    const shaderMap = new Map<string, ShaderDescriptor>(shaders?.map((shader) => [shader.id, shader]));
+    const shaderMap = new Map<string, ShaderDescriptor>(
+        shaders?.map((shader) => [shader.id, shader]),
+    );
     const compiledShaderMap = new Map<string, CompilerShader>();
 
     const getShaderDescriptor = (id: string): ShaderDescriptor => {
         return shaderMap.get(id)!;
-    }
+    };
 
     return {
         createGraph() {

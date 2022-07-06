@@ -1,7 +1,7 @@
-import { createNode } from "./node";
-import { uuid } from "./utils/uuid";
+import { createNode } from './node';
+import { uuid } from './utils/uuid';
 
-import type { Edge, EdgeConfig, Graph, Node, ShaderDescriptor } from "./types";
+import type { Edge, EdgeConfig, Graph, Node, ShaderDescriptor } from './types';
 
 interface GraphInternalConfig {
     getShaderDescriptor(shader: string): ShaderDescriptor | undefined;
@@ -10,8 +10,8 @@ interface GraphInternalConfig {
 function createEdge(config: EdgeConfig): Edge {
     return {
         id: uuid(),
-        ...config
-    }
+        ...config,
+    };
 }
 
 export function createGraph(config: GraphInternalConfig): Graph {
@@ -39,7 +39,7 @@ export function createGraph(config: GraphInternalConfig): Graph {
 
             return createNode({
                 ...config,
-                getShaderDescriptor
+                getShaderDescriptor,
             });
         },
         deleteNode(id) {
@@ -58,6 +58,6 @@ export function createGraph(config: GraphInternalConfig): Graph {
             const edge = edges.get(id);
             edges.delete(id);
             return edge;
-        }
-    }
+        },
+    };
 }

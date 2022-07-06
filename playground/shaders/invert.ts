@@ -1,4 +1,4 @@
-import { ShaderDescriptor, wgsl } from "../../src/main";
+import { ShaderDescriptor, wgsl } from '../../src/main';
 
 const SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {
