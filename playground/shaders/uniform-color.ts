@@ -1,22 +1,12 @@
-import { ShaderDescriptor } from "../../src/main";
+import { ShaderDescriptor, wgsl } from "../../src/main";
 
-const UNIFORM_COLOR_SOURCE = /* wgsl */ `
-    struct UniformColorConfig {
-        @location(0) color: vec3<f32>,
-    };
-
-    struct UniformColorOutput {
-        @location(0) output: vec4<f32>,
-    };
-
-    @group(0) @binding(0) var<uniform> config: UniformColorConfig;
-
-    @fragment
-    fn main(
-        @location(0) coordinate: vec2<f32>
-    ) -> UniformColorOutput {
+const UNIFORM_COLOR_SOURCE = wgsl`
+    fn run(coordinate: vec2<f32>) -> Output {
         var color = vec3<f32>(config.color);
-        return UniformColorOutput(vec4<f32>(color, 1.0));
+
+        var output = Output();
+        output.output = vec4<f32>(color, 1.0);
+        return output;
     }
 `;
 

@@ -3,13 +3,8 @@ import { createShaderModule } from './module';
 import { PropertiesBuffer } from './properties';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
-import type { Value, ShaderDescriptor, CompilerShader } from '../types';
-
-interface ShaderPipelineInput {
-    id: string;
-    sampler: GPUSampler;
-    layout: GPUBindGroupLayout;
-}
+import type { Value, ShaderDescriptor, CompilerShader, PropertyType, ShaderIOType } from '../types';
+import { wgsl } from './utils';
 
 export async function createCompiledShader(
     device: GPUDevice,
@@ -24,7 +19,7 @@ export async function createCompiledShader(
 
     const fragmentShaderModule = await createShaderModule(device, {
         label: `ShaderModule:Fragment:${id}`,
-        code: shader.source,
+        code: getShaderSource(shader),
     });
 
     const propertiesBuffer = new PropertiesBuffer(device, shader);
@@ -167,4 +162,78 @@ export async function createCompiledShader(
             propertiesBuffer.destroy();
         },
     };
+}
+
+function getShaderSource(shader: ShaderDescriptor): string {
+    const configStruct = wgsl`
+        struct Config {
+            ${Object.entries(shader.properties).map(
+                ([key, prop], index) => `@location(${index}) ${key} : ${wgslPropertyType(prop)},`,
+            )}
+        };
+    `;
+
+    const structBinding = wgsl`@group(0) @binding(0) var<uniform> config: Config;`;
+
+    const inputsBindings = Object.keys(shader.inputs).map((key, index) => wgsl`
+        @group(${index + 1}) @binding(0) var ${key}_texture: texture_2d<f32>;
+        @group(${index + 1}) @binding(1) var ${key}_sampler: sampler;
+    `)
+
+    const outputStruct = wgsl`
+        struct Output {
+            ${Object.entries(shader.outputs).map(
+                ([key, output], index) => `@location(${index}) ${key} : ${wgslIOType(output)},`,
+            )}
+        }
+    `;
+
+    return wgsl`
+        ${configStruct}
+        ${outputStruct}
+
+        ${structBinding}
+        ${inputsBindings}
+
+        ${shader.source}
+
+        @fragment
+        fn main(@location(0) coordinate: vec2<f32>) -> Output {
+            return run(coordinate);
+        }
+    `;
+}
+
+function wgslPropertyType(prop: PropertyType): string {
+    switch (prop.type) {
+        case 'boolean':
+            return 'u32';
+
+        case 'int1':
+            return 'u32';
+        case 'int2':
+            return 'vec2<u32>';
+        case 'int3':
+            return 'vec3<u32>';
+        case 'int4':
+            return 'vec4<u32>';
+
+        case 'float1':
+            return 'f32';
+        case 'float2':
+            return 'vec2<f32>';
+        case 'float3':
+            return 'vec3<f32>';
+        case 'float4':
+            return 'vec4<f32>';
+    }
+}
+
+function wgslIOType(ioType: ShaderIOType): string {
+    switch (ioType.type) {
+        case 'grayscale':
+            return 'f32';
+        case 'color':
+            return 'vec4<f32>';
+    }
 }
