@@ -1,4 +1,5 @@
-import { ShaderDescriptor, wgsl } from '../../src/main';
+import { ShaderDescriptor } from '../types';
+import { wgsl } from '../utils/wgsl';
 
 const UNIFORM_COLOR_SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {

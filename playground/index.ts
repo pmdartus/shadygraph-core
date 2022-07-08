@@ -1,8 +1,5 @@
-import { WebGPUBackend, createFloat3 } from '../src/main';
-
+import { WebGPUBackend, createFloat3, UNIFORM_COLOR, INVERT } from '../src/main';
 import { createPreviewCanvas } from './utils';
-import { UNIFORM_COLOR } from './shaders/uniform-color';
-import { INVERT } from './shaders/invert';
 
 const button = document.createElement('button');
 document.body.appendChild(button);
