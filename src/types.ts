@@ -75,35 +75,42 @@ export interface ShaderDescriptor {
 }
 
 export interface NodeConfig {
+    id?: string;
     shader: string;
+    properties?: Record<string, Value>;
 }
 
 export interface Node {
     readonly id: string;
     readonly shader: string;
-    readonly properties: Record<string, Value | undefined>;
+    readonly properties: Record<string, Value>;
+    readonly inputs: Record<string, Texture | null>;
+    readonly outputs: Record<string, Texture>;
     readonly isDirty: boolean;
-
-    renderNode(): Promise<unknown>;
 }
 
 export interface EdgeConfig {
-    from: Node;
+    id?: string;
+    from: string;
     fromPort: string;
-    to: Node;
+    to: string;
     toPort: string;
 }
 
 export interface Edge {
     readonly id: string;
-    from: Node;
-    fromPort: string;
-    to: Node;
-    toPort: string;
+    readonly from: Node;
+    readonly fromPort: string;
+    readonly to: Node;
+    readonly toPort: string;
 }
 
 export interface Graph {
     readonly id: string;
+
+    nodes(): Node[];
+    edges(): Edge[];
+    sortedNodes(): Node[];
 
     getNode(id: string): Node | undefined;
     getEdge(id: string): Edge | undefined;
@@ -115,16 +122,37 @@ export interface Graph {
     deleteEdge(id: string): Edge | undefined;
 }
 
+export interface SerializedNode {
+    id: string;
+    shader: string;
+    properties: Record<string, Value>;
+}
+
+export interface SerializedEdge {
+    id: string;
+    from: string;
+    fromPort: string;
+    to: string;
+    toPort: string;
+}
+
+export interface SerializedGraph {
+    readonly id: string;
+    readonly nodes: Record<string, SerializedNode>;
+    readonly edges: Record<string, SerializedEdge>;
+}
+
 export interface CompilerShader {
     render(
         properties: Record<string, Value>,
-        inputs: Record<string, Texture>,
+        inputs: Record<string, Texture | null>,
         outputs: Record<string, Texture>,
     ): void;
     destroy(): void;
 }
 
 export interface TextureConfig {
+    label?: string;
     type: TextureType;
     size: number;
 }
@@ -138,6 +166,7 @@ export interface Texture {
 export interface Backend {
     compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader>;
     createTexture(config: TextureConfig): Texture;
+    waitUntilDone(): Promise<void>;
 }
 
 export interface EngineConfig {
@@ -146,7 +175,10 @@ export interface EngineConfig {
 }
 
 export interface Engine {
+    backend: Backend;
     registerShader(descriptor: ShaderDescriptor): void;
-
+    getShaderDescriptor(id: string): ShaderDescriptor | undefined;
     createGraph(): Graph;
+    loadGraph(serializedGraph: SerializedGraph): Graph;
+    renderGraph(graph: Graph): Promise<void>;
 }

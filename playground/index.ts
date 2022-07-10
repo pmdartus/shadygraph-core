@@ -1,67 +1,67 @@
-import { WebGPUBackend, createFloat3, UNIFORM_COLOR, INVERT } from '../src/main';
+import { WebGPUBackend, createFloat3, UNIFORM_COLOR, INVERT, createEngine } from '../src/main';
 import { createPreviewCanvas } from './utils';
-
-const button = document.createElement('button');
-document.body.appendChild(button);
-button.textContent = 'Run';
-button.addEventListener('click', run);
 
 const backend = await WebGPUBackend.create();
 
-const uniformShader = await backend.compileShader(UNIFORM_COLOR);
-const invertShader = await backend.compileShader(INVERT);
-
-const uniformNode = {
-    shader: uniformShader,
-    canvas: createPreviewCanvas(),
-    properties: {
-        get color() {
-            return createFloat3([Math.random(), Math.random(), Math.random()]);
-        },
-    },
-    inputs: {},
-    outputs: {
-        output: backend.createTexture({ size: 512, type: 'color' }),
-    },
-};
-
-let currentOutput = uniformNode.outputs.output;
-
-const entries = new Array(1000).fill(null).map(() => {
-    const invertOutput = backend.createTexture({ size: 512, type: 'color' });
-
-    const invertNode = {
-        shader: invertShader,
-        canvas: createPreviewCanvas(),
-        properties: {
-            enabled: true,
-        },
-        inputs: {
-            input: currentOutput,
-        },
-        outputs: {
-            output: invertOutput,
-        },
-    };
-
-    currentOutput = invertOutput;
-    return invertNode;
+const engine = createEngine({
+    backend,
 });
 
-const nodes = [uniformNode, ...entries];
+engine.registerShader(UNIFORM_COLOR);
+engine.registerShader(INVERT);
 
-async function run() {
-    const start = performance.now();
+const graph = engine.loadGraph({
+    id: 'test',
+    nodes: {
+        A: {
+            id: 'A',
+            properties: {
+                color: createFloat3([1, 0, 0]),
+            },
+            shader: UNIFORM_COLOR.id,
+        },
+        B: {
+            id: 'B',
+            properties: {},
+            shader: INVERT.id,
+        },
+        C: {
+            id: 'C',
+            properties: {},
+            shader: INVERT.id,
+        },
+    },
+    edges: {
+        AB: {
+            id: 'AB',
+            from: 'A',
+            fromPort: 'output',
+            to: 'B',
+            toPort: 'input',
+        },
+        BC: {
+            id: 'BC',
+            from: 'B',
+            fromPort: 'output',
+            to: 'C',
+            toPort: 'input',
+        },
+    },
+});
 
-    for (const node of nodes) {
-        node.shader.render(node.properties as any, node.inputs, node.outputs);
-        backend.renderTexture(node.outputs.output, node.canvas);
+await engine.renderGraph(graph);
+
+for (const node of graph.nodes()) {
+    const container = document.createElement('div');
+    container.textContent = `${node.id} (${node.shader})`;
+    document.body.appendChild(container);
+
+    for (const [outputId, outputTexture] of Object.entries(node.outputs)) {
+        const outputContainer = document.createElement('div');
+        outputContainer.textContent = `${outputId}`;
+        container.appendChild(outputContainer);
+
+        const previewCanvas = createPreviewCanvas(outputContainer);
+        backend.renderTexture(outputTexture as any, previewCanvas);
     }
-
-    await backend.waitUntilDone();
-    const end = performance.now();
-
-    button.textContent = `Run (${Math.round(end - start)}ms)`;
 }
-
-run();

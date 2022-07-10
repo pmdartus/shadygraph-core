@@ -1,7 +1,6 @@
 import { Texture, TextureConfig, TextureType } from '../types';
 
 export interface WebGPUTextureConfig extends TextureConfig {
-    label?: string;
     usage?: GPUTextureUsageFlags;
 }
 

@@ -44,7 +44,7 @@ export function wgsl(tmpls: string | TemplateStringsArray, ...values: unknown[])
 
         let interpolatedValue = Array.isArray(value) ? value.join('\n') : String(value);
 
-        // Reindent the interpolated value if needed.
+        // Re-indent the interpolated value if needed.
         if (interpolatedValue.includes('\n')) {
             interpolatedValue = interpolatedValue
                 .split('\n')
