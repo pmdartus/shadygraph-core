@@ -99,11 +99,9 @@ export async function createCompiledShader(
         fragment: {
             module: fragmentShaderModule,
             entryPoint: 'main',
-            targets: [
-                {
-                    format: 'rgba8unorm',
-                },
-            ],
+            targets: Object.values(shader.outputs).map((outputType) => ({
+                format: ioTypeToTextureFormat(outputType),
+            })),
         },
         primitive: {
             topology: 'triangle-list',
@@ -169,7 +167,8 @@ function getShaderSource(shader: ShaderDescriptor): string {
     const configStruct = wgsl`
         struct Config {
             ${Object.entries(shader.properties).map(
-                ([key, prop], index) => `@location(${index}) ${key} : ${wgslPropertyType(prop)},`,
+                ([key, prop], index) =>
+                    `@location(${index}) ${key} : ${propertyTypeToWgslType(prop)},`,
             )}
         };
     `;
@@ -186,7 +185,8 @@ function getShaderSource(shader: ShaderDescriptor): string {
     const outputStruct = wgsl`
         struct Output {
             ${Object.entries(shader.outputs).map(
-                ([key, output], index) => `@location(${index}) ${key} : ${wgslIOType(output)},`,
+                ([key, output], index) =>
+                    `@location(${index}) ${key} : ${ioTypeToWgslType(output)},`,
             )}
         }
     `;
@@ -207,7 +207,7 @@ function getShaderSource(shader: ShaderDescriptor): string {
     `;
 }
 
-function wgslPropertyType(prop: PropertyType): string {
+function propertyTypeToWgslType(prop: PropertyType): string {
     switch (prop.type) {
         case 'boolean':
             return 'u32';
@@ -232,11 +232,20 @@ function wgslPropertyType(prop: PropertyType): string {
     }
 }
 
-function wgslIOType(ioType: ShaderIOType): string {
+function ioTypeToWgslType(ioType: ShaderIOType): string {
     switch (ioType.type) {
         case 'grayscale':
             return 'f32';
         case 'color':
             return 'vec4<f32>';
+    }
+}
+
+function ioTypeToTextureFormat(ioType: ShaderIOType): GPUTextureFormat {
+    switch (ioType.type) {
+        case 'grayscale':
+            return 'r8unorm';
+        case 'color':
+            return 'rgba8unorm';
     }
 }

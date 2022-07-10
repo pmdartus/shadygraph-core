@@ -1,6 +1,8 @@
-import { FRAGMENT_SHADER_FULLSCREEN_CODE, VERTEX_SHADER_CODE } from './shader-source';
+import { TextureType } from '../types';
+import { FRAGMENT_SHADER_FULLSCREEN_COLOR_CODE, VERTEX_SHADER_CODE } from './shader-source';
 
 interface PreviewRendererConfig {
+    textureType: TextureType;
     format: GPUTextureFormat;
 }
 
@@ -39,7 +41,7 @@ export function createPreviewRenderer(
         },
         fragment: {
             module: device.createShaderModule({
-                code: FRAGMENT_SHADER_FULLSCREEN_CODE,
+                code: FRAGMENT_SHADER_FULLSCREEN_COLOR_CODE,
             }),
             entryPoint: 'main',
             targets: [

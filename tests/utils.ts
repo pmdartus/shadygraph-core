@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { createServer, ViteDevServer } from 'vite';
 import * as puppeteer from 'puppeteer';
 import { Browser, Page } from 'puppeteer';
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
+
+import { ShaderDescriptor, Value } from '../src/main';
 
 export interface TestHarness {
     server: ViteDevServer;
@@ -77,4 +80,59 @@ export async function createHarness(): Promise<TestHarness> {
             await Promise.all([browser.close(), server.close()]);
         },
     };
+}
+
+export function testShader(shader: ShaderDescriptor, tests: Record<string, Record<string, Value>>) {
+    describe(shader.id, () => {
+        let harness: TestHarness;
+
+        beforeAll(async () => {
+            harness = await createHarness();
+        });
+
+        beforeEach(async () => {
+            await harness.reset();
+        });
+
+        afterAll(async () => {
+            await harness.close();
+        });
+
+        for (const [name, props] of Object.entries(tests)) {
+            test(name, async () => {
+                const { page } = harness;
+
+                await page.evaluate(
+                    async (shader, props) => {
+                        const compiledShader = await window.backend.compileShader(shader);
+
+                        const output = window.backend.createTexture({
+                            size: 512,
+                            type: shader.outputs.output.type,
+                        });
+                        compiledShader.render(props, {}, { output });
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 512;
+                        canvas.height = 512;
+                        document.body.appendChild(canvas);
+
+                        window.backend.renderTexture(output, canvas);
+                        await window.backend.waitUntilDone();
+                    },
+                    shader,
+                    props,
+                );
+
+                const canvas = await page.$('canvas');
+                const actualTexture = (await canvas!.screenshot({
+                    type: 'png',
+                })) as Buffer;
+
+                await expect(actualTexture).toMatchImageSnapshot({
+                    name: `${shader.id}-${name}`,
+                });
+            });
+        }
+    });
 }
