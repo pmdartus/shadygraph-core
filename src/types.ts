@@ -1,3 +1,7 @@
+import { Node, NodeConfig } from './node';
+import { Edge, EdgeConfig } from './edge';
+import { Graph, SerializedGraph } from './graph';
+
 type ValueTypeMap = {
     boolean: boolean;
     float1: [number];
@@ -72,74 +76,6 @@ export interface ShaderDescriptor {
     properties: Record<string, PropertyType>;
     inputs: Record<string, ShaderIOType>;
     outputs: Record<string, ShaderIOType>;
-}
-
-export interface NodeConfig {
-    id?: string;
-    shader: string;
-    properties?: Record<string, Value>;
-}
-
-export interface Node {
-    readonly id: string;
-    readonly shader: string;
-    readonly properties: Record<string, Value>;
-    readonly inputs: Record<string, Texture | null>;
-    readonly outputs: Record<string, Texture>;
-    readonly isDirty: boolean;
-}
-
-export interface EdgeConfig {
-    id?: string;
-    from: string;
-    fromPort: string;
-    to: string;
-    toPort: string;
-}
-
-export interface Edge {
-    readonly id: string;
-    readonly from: Node;
-    readonly fromPort: string;
-    readonly to: Node;
-    readonly toPort: string;
-}
-
-export interface Graph {
-    readonly id: string;
-
-    nodes(): Node[];
-    edges(): Edge[];
-    sortedNodes(): Node[];
-
-    getNode(id: string): Node | undefined;
-    getEdge(id: string): Edge | undefined;
-
-    createNode(config: NodeConfig): Node;
-    deleteNode(id: string): Node | undefined;
-
-    createEdge(config: EdgeConfig): Edge;
-    deleteEdge(id: string): Edge | undefined;
-}
-
-export interface SerializedNode {
-    id: string;
-    shader: string;
-    properties: Record<string, Value>;
-}
-
-export interface SerializedEdge {
-    id: string;
-    from: string;
-    fromPort: string;
-    to: string;
-    toPort: string;
-}
-
-export interface SerializedGraph {
-    readonly id: string;
-    readonly nodes: Record<string, SerializedNode>;
-    readonly edges: Record<string, SerializedEdge>;
 }
 
 export interface CompilerShader {

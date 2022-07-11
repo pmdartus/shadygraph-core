@@ -1,112 +1,113 @@
-import { assertValueType } from './value';
 import { propertyTypeDefaultValue } from './shader-descriptor';
 
+import { Graph } from './graph';
 import { uuid } from './utils/uuid';
 
-import type { Engine, Graph, Node, NodeConfig, ShaderDescriptor, Texture, Value } from './types';
+import type { Engine, ShaderDescriptor, Texture, Value } from './types';
 
-function createPropertiesProxy(
-    config: NodeConfig,
-    engine: Engine,
-    propertyChanged?: (target: string, value: Value) => void,
-): Record<string, Value> {
-    const { shader, properties = {} } = config;
-
-    function getExistingShaderDescriptor(shader: string): ShaderDescriptor {
-        return engine.getShaderDescriptor(shader)!;
-    }
-
-    function getValue(target: { [name: string]: Value }, key: string): Value | undefined {
-        if (key in target) {
-            return target[key];
-        }
-
-        const shaderDescriptor = getExistingShaderDescriptor(shader);
-        const propertyType = shaderDescriptor.properties[key];
-
-        return propertyTypeDefaultValue(propertyType);
-    }
-
-    return new Proxy(properties, {
-        get: getValue,
-        set(target, key: string, value: Value) {
-            const shaderDescriptor = getExistingShaderDescriptor(shader);
-            const propertyType = shaderDescriptor.properties[key];
-
-            if (!propertyType) {
-                throw new Error(`Property ${key} does not exist in shader ${shader}`);
-            }
-
-            assertValueType(value, propertyType.type);
-
-            target[key] = value;
-            propertyChanged?.(key, value);
-
-            return true;
-        },
-        ownKeys() {
-            const shaderDescriptor = getExistingShaderDescriptor(shader);
-            return Object.keys(shaderDescriptor.properties);
-        },
-        has(target, key) {
-            const shaderDescriptor = getExistingShaderDescriptor(shader);
-            return Object.hasOwn(shaderDescriptor.properties, key);
-        },
-        getOwnPropertyDescriptor(target, key: string) {
-            const value = getValue(target, key);
-            return {
-                value,
-                enumerable: true,
-                writable: true,
-                configurable: true,
-            };
-        },
-    });
+export interface NodeConfig {
+    shader: ShaderDescriptor;
+    properties: Record<string, Value>;
 }
 
-export function createNode(config: NodeConfig, engine: Engine, graph: Graph): Node {
-    const { id = uuid(), shader } = config;
+export interface SerializedNode {
+    id: string;
+    shader: string;
+    properties: Record<string, Value>;
+}
 
-    let isDirty = true;
+export class Node {
+    id: string;
+    shader: ShaderDescriptor;
+    properties: Record<string, Value>;
+    outputs: Record<string, Texture>;
+    _isDirty: boolean;
+    #graph: Graph;
 
-    const properties = createPropertiesProxy(config, engine, () => {
-        isDirty = true;
-    });
+    /** @internal */
+    constructor(
+        config: NodeConfig & {
+            id?: string;
+            outputs: Record<string, Texture>;
+            graph: Graph;
+        },
+    ) {
+        this.id = config.id ?? uuid();
+        this.properties = config.properties;
+        this.outputs = config.outputs ?? {};
+        this.shader = config.shader;
 
-    const shaderDescriptor = engine.getShaderDescriptor(shader)!;
+        // Mark all the newly created nodes as dirty.
+        this._isDirty = true;
 
-    const outputs = Object.fromEntries(
-        Object.entries(shaderDescriptor.outputs).map(([outputId, output]) => {
-            const texture = engine.backend.createTexture({
-                label: `${id}:${shaderDescriptor.id}:${outputId}`,
-                type: output.type,
-                size: 512,
-            });
+        this.#graph = config.graph;
+    }
 
-            return [outputId, texture];
-        }),
-    );
+    getProperties(): Record<string, Value> {
+        return Object.fromEntries(
+            Object.entries(this.shader.properties).map(([name, property]) => {
+                const value = this.properties[name] ?? propertyTypeDefaultValue(property);
+                return [name, value];
+            }),
+        );
+    }
 
-    return {
-        id,
-        shader,
-        properties,
-        outputs,
-        get inputs() {
-            const inputs: Record<string, Texture | null> = Object.fromEntries(
-                Object.keys(shaderDescriptor.inputs).map((inputId) => [inputId, null]),
-            );
+    getInputs(): Record<string, Texture | null> {
+        const incomingEdges = this.#graph.getIncomingEdges(this);
 
-            for (const edge of graph.edges()) {
-                if (edge.to.id === id) {
-                    inputs[edge.toPort] = edge.from.outputs[edge.fromPort];
+        return Object.fromEntries(
+            Object.keys(this.shader.inputs).map((name) => {
+                let texture: Texture | null = null;
+
+                const inputEdge = incomingEdges.find((edge) => edge.toPort === name);
+                if (inputEdge) {
+                    texture = inputEdge.fromNode().outputs[inputEdge.fromPort];
                 }
-            }
 
-            return inputs;
-        },
-        get isDirty() {
-            return isDirty;
-        },
-    };
+                return [name, texture];
+            }),
+        );
+    }
+
+    getOutputs(): Record<string, Texture> {
+        return this.outputs;
+    }
+
+    toJSON(): SerializedNode {
+        return {
+            id: this.id,
+            shader: this.shader.id,
+            properties: this.properties,
+        };
+    }
+
+    static fromJSON(json: SerializedNode, ctx: { engine: Engine; graph: Graph }): Node {
+        const shader = ctx.engine.getShaderDescriptor(json.shader);
+        if (!shader) {
+            throw new Error(`Shader "${json.shader}" not found.`);
+        }
+
+        return Node.create(
+            {
+                ...json,
+                shader,
+            },
+            ctx,
+        );
+    }
+
+    static create(config: NodeConfig, ctx: { engine: Engine; graph: Graph }): Node {
+        const outputs = Object.fromEntries(
+            Object.entries(config.shader.outputs).map(([name, texture]) => [
+                name,
+                ctx.engine.backend.createTexture({ size: 512, type: texture.type }),
+            ]),
+        );
+
+        return new Node({
+            ...config,
+            outputs,
+            graph: ctx.graph,
+        });
+    }
 }

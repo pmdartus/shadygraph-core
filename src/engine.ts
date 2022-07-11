@@ -1,4 +1,4 @@
-import { createGraph } from './graph';
+import { Graph } from './graph';
 
 import type { CompilerShader, Engine, EngineConfig, ShaderDescriptor } from './types';
 
@@ -9,37 +9,25 @@ export function createEngine(config: EngineConfig): Engine {
         shaders?.map((shader) => [shader.id, shader]),
     );
 
-    const compiledShaderMap = new Map<string, CompilerShader>();
-    const compiledShaderPromiseMap = new Map<string, Promise<CompilerShader>>();
+    const compiledShaderMap = new Map<ShaderDescriptor, CompilerShader>();
+    const compiledShaderPromiseMap = new Map<ShaderDescriptor, Promise<CompilerShader>>();
 
     const engine: Engine = {
         backend,
         createGraph() {
-            return createGraph({}, engine);
+            return Graph.create({ engine });
         },
         registerShader(shader) {
             shaderMap.set(shader.id, shader);
-            compiledShaderMap.delete(shader.id);
-            compiledShaderMap.delete(shader.id);
         },
         getShaderDescriptor(id) {
             return shaderMap.get(id);
         },
         loadGraph(data) {
-            const graph = createGraph(data, engine);
-
-            for (const node of Object.values(data.nodes)) {
-                graph.createNode(node);
-            }
-
-            for (const edges of Object.values(data.edges)) {
-                graph.createEdge(edges);
-            }
-
-            return graph;
+            return Graph.fromJSON(data, { engine });
         },
         async renderGraph(graph) {
-            const nodes = graph.sortedNodes();
+            const nodes = Array.from(graph.iterNodes());
 
             await Promise.all(
                 nodes.map(async (node) => {
@@ -48,7 +36,7 @@ export function createEngine(config: EngineConfig): Engine {
                     let shaderCompiledPromise = compiledShaderPromiseMap.get(shader);
 
                     if (!shaderCompiledPromise) {
-                        const descriptor = shaderMap.get(shader)!;
+                        const descriptor = shaderMap.get(shader.id)!;
 
                         shaderCompiledPromise = backend
                             .compileShader(descriptor)
@@ -66,7 +54,12 @@ export function createEngine(config: EngineConfig): Engine {
 
             for (const node of nodes) {
                 const compiledShader = compiledShaderMap.get(node.shader)!;
-                compiledShader.render(node.properties, node.inputs, node.outputs);
+
+                const properties = node.getProperties();
+                const inputs = node.getInputs();
+                const outputs = node.getOutputs();
+
+                compiledShader.render(properties, inputs, outputs);
             }
 
             return backend.waitUntilDone();

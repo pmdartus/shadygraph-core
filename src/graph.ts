@@ -1,118 +1,128 @@
-import { createNode } from './node';
+import { Edge, isValidEdge, SerializedEdge } from './edge';
+import { Node, SerializedNode } from './node';
+
 import { uuid } from './utils/uuid';
 
-import type { Edge, EdgeConfig, Engine, Graph, Node } from './types';
+import type { Engine } from './types';
 
-interface GraphConfig {
-    id?: string;
+export interface SerializedGraph {
+    readonly id: string;
+    readonly nodes: Record<string, SerializedNode>;
+    readonly edges: Record<string, SerializedEdge>;
 }
 
-function createEdge(config: EdgeConfig, graph: Graph): Edge {
-    const { id = uuid(), from, fromPort, to, toPort } = config;
+export class Graph {
+    id: string;
+    _nodeMap = new Map<string, Node>();
+    _edgeMap = new Map<string, Edge>();
+    #engine: Engine;
 
-    return {
-        id,
-        get from() {
-            return graph.getNode(from)!;
-        },
-        get to() {
-            return graph.getNode(to)!;
-        },
-        fromPort,
-        toPort,
-    };
-}
+    /** @internal */
+    constructor(config: { id: string; engine: Engine }) {
+        this.id = config.id;
+        this.#engine = config.engine;
+    }
 
-export function createGraph(config: GraphConfig, engine: Engine): Graph {
-    const { id = uuid() } = config;
+    getNode(id: string): Node | undefined {
+        return this._nodeMap.get(id);
+    }
 
-    const nodes = new Map<string, Node>();
-    const edges = new Map<string, Edge>();
+    getEdge(id: string): Edge | undefined {
+        return this._edgeMap.get(id);
+    }
 
-    const graph: Graph = {
-        id,
+    getOutgoingEdges(node: Node): Edge[] {
+        return Array.from(this._edgeMap.values()).filter((edge) => edge.from === node.id);
+    }
 
-        getNode(id) {
-            return nodes.get(id);
-        },
-        nodes() {
-            return [...nodes.values()];
-        },
-        getEdge(id) {
-            return edges.get(id);
-        },
-        edges() {
-            return [...edges.values()];
-        },
+    getIncomingEdges(node: Node): Edge[] {
+        return Array.from(this._edgeMap.values()).filter((edge) => edge.to === node.id);
+    }
 
-        createNode(config) {
-            if (engine.getShaderDescriptor(config.shader) === undefined) {
-                throw new Error(`Shader "${config.shader}" not found`);
-            }
+    clone(): Graph {
+        const graph = new Graph({
+            id: this.id,
+            engine: this.#engine,
+        });
 
-            const node = createNode(config, engine, graph);
-            nodes.set(node.id, node);
+        graph._nodeMap = new Map(this._nodeMap);
+        graph._edgeMap = new Map(this._edgeMap);
 
-            return node;
-        },
-        deleteNode(id) {
-            const node = nodes.get(id);
-            nodes.delete(id);
+        return graph;
+    }
 
-            return node;
-        },
+    *iterNodes(): Iterable<Node> {
+        const inDegrees = new Map<Node, number>(
+            Array.from(this._nodeMap.values()).map((node) => [node, 0]),
+        );
 
-        createEdge(config) {
-            const fromNode = nodes.get(config.from);
-            if (!fromNode) {
-                throw new Error(`Node "${config.from}" not found`);
-            }
+        for (const edge of this._edgeMap.values()) {
+            const toNode = edge.toNode();
+            inDegrees.set(toNode, inDegrees.get(toNode)! + 1);
+        }
 
-            const toNode = nodes.get(config.to);
-            if (!toNode) {
-                throw new Error(`Node "${config.to}" not found`);
-            }
+        while (inDegrees.size > 0) {
+            for (const [node, inDegree] of inDegrees.entries()) {
+                if (inDegree === 0) {
+                    inDegrees.delete(node);
 
-            const edge = createEdge(config, graph);
-            edges.set(edge.id, edge);
+                    yield node;
 
-            return edge;
-        },
-        deleteEdge() {
-            const edge = edges.get(id);
-            edges.delete(id);
-
-            return edge;
-        },
-
-        sortedNodes() {
-            const sorted = [];
-
-            const inDegrees = new Map<Node, number>(
-                Array.from(nodes.values()).map((node) => [node, 0]),
-            );
-            for (const edge of edges.values()) {
-                inDegrees.set(edge.to, inDegrees.get(edge.to)! + 1);
-            }
-
-            while (inDegrees.size > 0) {
-                for (const [node, inDegree] of inDegrees.entries()) {
-                    if (inDegree === 0) {
-                        inDegrees.delete(node);
-                        sorted.push(node);
-
-                        for (const edge of edges.values()) {
-                            if (edge.from === node) {
-                                inDegrees.set(edge.to, inDegrees.get(edge.to)! - 1);
-                            }
-                        }
+                    for (const edge of this.getOutgoingEdges(node)) {
+                        const toNode = edge.toNode();
+                        inDegrees.set(toNode, inDegrees.get(toNode)! - 1);
                     }
                 }
             }
+        }
+    }
 
-            return sorted;
-        },
-    };
+    toJSON(): SerializedGraph {
+        const { id, _nodeMap, _edgeMap } = this;
 
-    return graph;
+        const nodes = Object.fromEntries(
+            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON()]),
+        );
+        const edges = Object.fromEntries(
+            Array.from(_edgeMap.values()).map((edge) => [edge.id, edge.toJSON()]),
+        );
+
+        return {
+            id,
+            nodes,
+            edges,
+        };
+    }
+
+    static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): Graph {
+        const graph = new Graph({
+            id: json.id,
+            engine: ctx.engine,
+        });
+
+        const graphCtx = { ...ctx, graph };
+
+        for (const [id, serializedNode] of Object.entries(json.nodes)) {
+            const node = Node.fromJSON(serializedNode, graphCtx);
+            graph._nodeMap.set(id, node);
+        }
+
+        for (const [id, serializedEdge] of Object.entries(json.edges)) {
+            const edge = Edge.fromJSON(serializedEdge, graphCtx);
+            if (!isValidEdge(edge, graph)) {
+                throw new Error(`Invalid edge: ${JSON.stringify(serializedEdge)}`);
+            }
+
+            graph._edgeMap.set(id, edge);
+        }
+
+        return graph;
+    }
+
+    static create(ctx: { engine: Engine }): Graph {
+        return new Graph({
+            id: uuid(),
+            engine: ctx.engine,
+        });
+    }
 }

@@ -51,7 +51,7 @@ const graph = engine.loadGraph({
 
 await engine.renderGraph(graph);
 
-for (const node of graph.nodes()) {
+for (const node of graph.iterNodes()) {
     const container = document.createElement('div');
     container.textContent = `${node.id} (${node.shader})`;
     document.body.appendChild(container);
