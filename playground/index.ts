@@ -12,6 +12,8 @@ engine.registerShader(INVERT);
 
 const graph = engine.loadGraph({
     id: 'test',
+    size: 512,
+    label: 'Test Graph',
     nodes: {
         A: {
             id: 'A',

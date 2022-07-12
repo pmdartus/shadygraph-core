@@ -5,21 +5,32 @@ import { uuid } from './utils/uuid';
 
 import type { Engine } from './types';
 
+export interface GraphConfig {
+    size?: number;
+    label?: string;
+}
+
 export interface SerializedGraph {
-    readonly id: string;
-    readonly nodes: Record<string, SerializedNode>;
-    readonly edges: Record<string, SerializedEdge>;
+    id: string;
+    size: number;
+    label: string;
+    nodes: Record<string, SerializedNode>;
+    edges: Record<string, SerializedEdge>;
 }
 
 export class Graph {
     id: string;
+    size: number;
+    label: string;
     _nodeMap = new Map<string, Node>();
     _edgeMap = new Map<string, Edge>();
     #engine: Engine;
 
     /** @internal */
-    constructor(config: { id: string; engine: Engine }) {
+    constructor(config: { id: string; size: number; label: string; engine: Engine }) {
         this.id = config.id;
+        this.size = config.size;
+        this.label = config.label;
         this.#engine = config.engine;
     }
 
@@ -42,6 +53,8 @@ export class Graph {
     clone(): Graph {
         const graph = new Graph({
             id: this.id,
+            size: this.size,
+            label: this.label,
             engine: this.#engine,
         });
 
@@ -78,7 +91,7 @@ export class Graph {
     }
 
     toJSON(): SerializedGraph {
-        const { id, _nodeMap, _edgeMap } = this;
+        const { id, size, label, _nodeMap, _edgeMap } = this;
 
         const nodes = Object.fromEntries(
             Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON()]),
@@ -89,6 +102,8 @@ export class Graph {
 
         return {
             id,
+            size,
+            label,
             nodes,
             edges,
         };
@@ -96,7 +111,7 @@ export class Graph {
 
     static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): Graph {
         const graph = new Graph({
-            id: json.id,
+            ...json,
             engine: ctx.engine,
         });
 
@@ -119,9 +134,11 @@ export class Graph {
         return graph;
     }
 
-    static create(ctx: { engine: Engine }): Graph {
+    static create(config: GraphConfig, ctx: { engine: Engine }): Graph {
         return new Graph({
             id: uuid(),
+            size: config.size ?? 512,
+            label: config.label ?? '',
             engine: ctx.engine,
         });
     }

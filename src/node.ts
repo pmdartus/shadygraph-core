@@ -21,7 +21,6 @@ export class Node {
     shader: ShaderDescriptor;
     properties: Record<string, Value>;
     outputs: Record<string, Texture>;
-    _isDirty: boolean;
     #graph: Graph;
 
     /** @internal */
@@ -36,9 +35,6 @@ export class Node {
         this.properties = config.properties;
         this.outputs = config.outputs ?? {};
         this.shader = config.shader;
-
-        // Mark all the newly created nodes as dirty.
-        this._isDirty = true;
 
         this.#graph = config.graph;
     }
@@ -100,7 +96,7 @@ export class Node {
         const outputs = Object.fromEntries(
             Object.entries(config.shader.outputs).map(([name, texture]) => [
                 name,
-                ctx.engine.backend.createTexture({ size: 512, type: texture.type }),
+                ctx.engine.backend.createTexture({ size: ctx.graph.size, type: texture.type }),
             ]),
         );
 

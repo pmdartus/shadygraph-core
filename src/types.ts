@@ -1,6 +1,6 @@
 import { Node, NodeConfig } from './node';
 import { Edge, EdgeConfig } from './edge';
-import { Graph, SerializedGraph } from './graph';
+import { Graph, GraphConfig, SerializedGraph } from './graph';
 
 type ValueTypeMap = {
     boolean: boolean;
@@ -114,7 +114,7 @@ export interface Engine {
     backend: Backend;
     registerShader(descriptor: ShaderDescriptor): void;
     getShaderDescriptor(id: string): ShaderDescriptor | undefined;
-    createGraph(): Graph;
+    createGraph(config: GraphConfig): Graph;
     loadGraph(serializedGraph: SerializedGraph): Graph;
     renderGraph(graph: Graph): Promise<void>;
 }

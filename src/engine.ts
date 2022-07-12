@@ -14,8 +14,8 @@ export function createEngine(config: EngineConfig): Engine {
 
     const engine: Engine = {
         backend,
-        createGraph() {
-            return Graph.create({ engine });
+        createGraph(config) {
+            return Graph.create(config, { engine });
         },
         registerShader(shader) {
             shaderMap.set(shader.id, shader);

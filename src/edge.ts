@@ -65,6 +65,36 @@ export class Edge {
     }
 }
 
-export function isValidEdge(config: EdgeConfig, graph: Graph): boolean {
-    return true;
+export function isValidEdge(
+    config: EdgeConfig,
+    graph: Graph,
+): { isValid: boolean; reason?: string } {
+    const fromNode = graph.getNode(config.from);
+    if (!fromNode) {
+        return { isValid: false, reason: `No node found with id ${config.from}` };
+    }
+
+    const output = fromNode.getOutputs()[config.fromPort];
+    if (!output) {
+        return { isValid: false, reason: `No output found with name ${config.fromPort}` };
+    }
+
+    const toNode = graph.getNode(config.to);
+    if (!toNode) {
+        return { isValid: false, reason: `No node found with id ${config.to}` };
+    }
+
+    const input = toNode.getInputs()[config.toPort];
+    if (!input) {
+        return { isValid: false, reason: `No input found with name ${config.toPort}` };
+    }
+
+    const isInputAlreadyConnected = graph
+        .getIncomingEdges(toNode)
+        .some((edge) => edge.toPort === config.toPort);
+    if (isInputAlreadyConnected) {
+        return { isValid: false, reason: `Input ${config.toPort} is already connected` };
+    }
+
+    return { isValid: true };
 }
