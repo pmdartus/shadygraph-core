@@ -91,6 +91,9 @@ function sizeOfProperty(property: PropertyType): number {
         case 'float4':
         case 'int4':
             return 16;
+
+        case 'string':
+            throw new Error('String properties are not supported');
     }
 }
 
@@ -110,6 +113,9 @@ function alignmentOfProperty(property: PropertyType): number {
         case 'float4':
         case 'int4':
             return 16;
+
+        case 'string':
+            throw new Error('String properties are not supported');
     }
 }
 

@@ -229,6 +229,9 @@ function propertyTypeToWgslType(prop: PropertyType): string {
             return 'vec3<f32>';
         case 'float4':
             return 'vec4<f32>';
+
+        case 'string':
+            throw new Error('String properties are not supported');
     }
 }
 

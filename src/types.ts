@@ -1,5 +1,3 @@
-import { Node, NodeConfig } from './node';
-import { Edge, EdgeConfig } from './edge';
 import { Graph, GraphConfig, SerializedGraph } from './graph';
 
 type ValueTypeMap = {
@@ -12,6 +10,7 @@ type ValueTypeMap = {
     int2: [number, number];
     int3: [number, number, number];
     int4: [number, number, number, number];
+    string: string;
 };
 
 export type ValueMap = {
@@ -30,6 +29,7 @@ export type Int1Value = ValueMap['int1'];
 export type Int2Value = ValueMap['int2'];
 export type Int3Value = ValueMap['int3'];
 export type Int4Value = ValueMap['int4'];
+export type StringValue = ValueMap['string'];
 
 export type Value = ValueMap[keyof ValueMap];
 export type ValueType = Value['type'];
@@ -50,6 +50,7 @@ export type Int1PropertyType = BasePropertyType<'int1'>;
 export type Int2PropertyType = BasePropertyType<'int2'>;
 export type Int3PropertyType = BasePropertyType<'int3'>;
 export type Int4PropertyType = BasePropertyType<'int4'>;
+export type StringPropertyType = BasePropertyType<'string'>;
 
 export type PropertyType =
     | BooleanPropertyType
@@ -60,7 +61,8 @@ export type PropertyType =
     | Int1PropertyType
     | Int2PropertyType
     | Int3PropertyType
-    | Int4PropertyType;
+    | Int4PropertyType
+    | StringPropertyType;
 
 export type TextureType = 'color' | 'grayscale';
 
@@ -69,13 +71,16 @@ export interface ShaderIOType {
     type: TextureType;
 }
 
-export interface ShaderDescriptor {
-    id: string;
-    label: string;
-    source: string;
+export interface NodeDescriptor {
     properties: Record<string, PropertyType>;
     inputs: Record<string, ShaderIOType>;
     outputs: Record<string, ShaderIOType>;
+}
+
+export interface ShaderDescriptor extends NodeDescriptor {
+    id: string;
+    label: string;
+    source: string;
 }
 
 export interface CompilerShader {
