@@ -1,12 +1,15 @@
-export function createPreviewCanvas(target = document.body) {
+export function createPreviewCanvas(
+    target: HTMLElement = document.body,
+    size = 30,
+): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
     target.appendChild(canvas);
 
     canvas.width = 512;
     canvas.height = 512;
 
-    canvas.style.width = `30px`;
-    canvas.style.height = `30px`;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
 
     return canvas;
 }

@@ -1,0 +1,46 @@
+{
+    "id": "invert",
+    "label": "Invert",
+    "size": 512,
+    "nodes": {
+        "A": {
+            "id": "A",
+            "type": "shader",
+            "shader": "#uniform-color",
+            "properties": {
+                "color": {
+                    "type": "float3",
+                    "value": [1, 0, 0]
+                }
+            }
+        },
+        "B": {
+            "id": "B",
+            "type": "shader",
+            "properties": {},
+            "shader": "#invert"
+        },
+        "C": {
+            "id": "C",
+            "type": "shader",
+            "properties": {},
+            "shader": "#invert"
+        }
+    },
+    "edges": {
+        "AB": {
+            "id": "AB",
+            "from": "A",
+            "fromPort": "output",
+            "to": "B",
+            "toPort": "input"
+        },
+        "BC": {
+            "id": "BC",
+            "from": "B",
+            "fromPort": "output",
+            "to": "C",
+            "toPort": "input"
+        }
+    }
+}

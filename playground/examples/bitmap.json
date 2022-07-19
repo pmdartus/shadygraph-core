@@ -1,0 +1,46 @@
+{
+    "id": "bitmap",
+    "label": "Bitmap",
+    "size": 512,
+    "nodes": {
+        "A": {
+            "id": "A",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "https://placekitten.com/512/512"
+                }
+            }
+        },
+        "B": {
+            "id": "B",
+            "type": "shader",
+            "properties": {},
+            "shader": "#invert"
+        },
+        "C": {
+            "id": "C",
+            "type": "shader",
+            "properties": {},
+            "shader": "#invert"
+        }
+    },
+    "edges": {
+        "AB": {
+            "id": "AB",
+            "from": "A",
+            "fromPort": "output",
+            "to": "B",
+            "toPort": "input"
+        },
+        "BC": {
+            "id": "BC",
+            "from": "B",
+            "fromPort": "output",
+            "to": "C",
+            "toPort": "input"
+        }
+    }
+}

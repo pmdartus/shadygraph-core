@@ -1,6 +1,15 @@
-import { WebGPUBackend, UNIFORM_COLOR, INVERT, createEngine } from '../src/main';
-import { BuiltInNodeType } from '../src/node';
+import {
+    WebGPUBackend,
+    UNIFORM_COLOR,
+    INVERT,
+    createEngine,
+    Graph,
+    SerializedGraph,
+} from '../src/main';
 import { createPreviewCanvas } from './utils';
+
+const select = document.querySelector('select')!;
+const root = document.querySelector('#container')!;
 
 const backend = await WebGPUBackend.create();
 
@@ -11,74 +20,76 @@ const engine = createEngine({
 engine.registerShader(UNIFORM_COLOR);
 engine.registerShader(INVERT);
 
-const graph = engine.loadGraph({
-    id: 'test',
-    size: 512,
-    label: 'Test Graph',
-    nodes: {
-        // A: {
-        //     id: 'A',
-        //     type: 'shader',
-        //     shader: UNIFORM_COLOR.id,
-        //     properties: {
-        //         color: createFloat3([1, 0, 0]),
-        //     },
-        // },
-        A: {
-            id: 'A',
-            type: 'builtin',
-            nodeType: BuiltInNodeType.Bitmap,
-            properties: {
-                source: {
-                    type: 'string',
-                    value: 'https://placekitten.com/512/512',
-                },
-            },
-        },
-        B: {
-            id: 'B',
-            type: 'shader',
-            properties: {},
-            shader: INVERT.id,
-        },
-        C: {
-            id: 'C',
-            type: 'shader',
-            properties: {},
-            shader: INVERT.id,
-        },
-    },
-    edges: {
-        AB: {
-            id: 'AB',
-            from: 'A',
-            fromPort: 'output',
-            to: 'B',
-            toPort: 'input',
-        },
-        BC: {
-            id: 'BC',
-            from: 'B',
-            fromPort: 'output',
-            to: 'C',
-            toPort: 'input',
-        },
-    },
-});
+async function fetchGraph(id: string): Promise<SerializedGraph> {
+    const response = await fetch(`/examples/${id}.json`);
+    return response.json();
+}
 
-await engine.renderGraph(graph);
+async function renderExample(id: string) {
+    const data = await fetchGraph(id);
+    const graph = engine.loadGraph(data);
 
-for (const node of graph.iterNodes()) {
-    const container = document.createElement('div');
-    container.textContent = `${node.id} (${node.shader})`;
-    document.body.appendChild(container);
+    await engine.renderGraph(graph);
 
-    for (const [outputId, outputTexture] of Object.entries(node.outputs)) {
-        const outputContainer = document.createElement('div');
-        outputContainer.textContent = `${outputId}`;
-        container.appendChild(outputContainer);
+    renderPreviews(graph);
+}
 
-        const previewCanvas = createPreviewCanvas(outputContainer);
-        backend.renderTexture(outputTexture as any, previewCanvas);
+function renderPreviews(graph: Graph) {
+    while (root.firstChild) {
+        root.firstChild.remove();
+    }
+
+    for (const node of graph.iterNodes()) {
+        const container = document.createElement('div');
+        if (node.type === 'shader') {
+            container.textContent = `${node.id} (shader: ${node.shader})`;
+        } else if (node.type === 'builtin') {
+            container.textContent = `${node.id} (type: ${node.nodeType})`;
+        }
+
+        root.appendChild(container);
+
+        for (const [outputId, outputTexture] of Object.entries(node.outputs)) {
+            const outputContainer = document.createElement('div');
+            outputContainer.textContent = `${outputId}`;
+            container.appendChild(outputContainer);
+
+            const previewCanvas = createPreviewCanvas(outputContainer, 128);
+            backend.renderTexture(outputTexture as any, previewCanvas);
+        }
     }
 }
+
+function updateQueyString({ id, replace = false }: { id: string; replace?: boolean }) {
+    const updatedUrl = new URL(window.location.href);
+    updatedUrl.searchParams.set('example', id);
+
+    if (replace) {
+        window.history.replaceState({}, '', updatedUrl);
+    } else {
+        window.history.pushState({}, '', updatedUrl);
+    }
+}
+
+function run() {
+    const url = new URL(window.location.href);
+
+    let example = url.searchParams.get('example');
+    if (example) {
+        select.value = example;
+    } else {
+        example = select.value;
+        updateQueyString({ id: example, replace: true });
+    }
+
+    select.addEventListener('change', () => {
+        const { value } = select;
+
+        updateQueyString({ id: value });
+        renderExample(value);
+    });
+
+    renderExample(example);
+}
+
+run();
