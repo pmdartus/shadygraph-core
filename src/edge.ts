@@ -1,41 +1,37 @@
 import { Node } from './node';
-import { Graph } from './graph';
+import { Graph, GraphContext } from './graph';
 
 import { uuid } from './utils/uuid';
 
-export interface EdgeConfig {
-    id?: string;
+export interface EdgeInterface {
+    id: string;
     from: string;
     fromPort: string;
     to: string;
     toPort: string;
 }
 
-export type SerializedEdge = Required<EdgeConfig>;
+export type EdgeConfig = Omit<EdgeInterface, 'id'>;
+export type SerializedEdge = EdgeInterface;
 
-export class Edge {
+export class Edge implements EdgeInterface {
     id: string;
     from: string;
     fromPort: string;
     to: string;
     toPort: string;
+
     #graph: Graph;
 
     /** @internal */
-    constructor(config: {
-        id?: string;
-        from: string;
-        fromPort: string;
-        to: string;
-        toPort: string;
-        graph: Graph;
-    }) {
-        this.id = config.id ?? uuid();
+    constructor(config: EdgeInterface, ctx: GraphContext) {
+        this.id = config.id;
         this.from = config.from;
         this.fromPort = config.fromPort;
         this.to = config.to;
         this.toPort = config.toPort;
-        this.#graph = config.graph;
+
+        this.#graph = ctx.graph;
     }
 
     fromNode(): Node {
@@ -56,12 +52,12 @@ export class Edge {
         };
     }
 
-    static fromJSON(json: SerializedEdge, ctx: { graph: Graph }): Edge {
-        return Edge.create(json, ctx);
+    static fromJSON(json: SerializedEdge, ctx: GraphContext): Edge {
+        return new Edge(json, ctx);
     }
 
-    static create(config: EdgeConfig, ctx: { graph: Graph }): Edge {
-        return new Edge({ ...config, graph: ctx.graph });
+    static create(config: EdgeConfig, ctx: GraphContext): Edge {
+        return new Edge({ ...config, id: uuid() }, ctx);
     }
 }
 

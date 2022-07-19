@@ -107,6 +107,7 @@ export interface Texture {
 export interface Backend {
     compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader>;
     createTexture(config: TextureConfig): Texture;
+    copyImageToTexture(source: ImageBitmap, target: Texture): void;
     waitUntilDone(): Promise<void>;
 }
 

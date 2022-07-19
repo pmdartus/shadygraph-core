@@ -1,5 +1,5 @@
 import { Edge, isValidEdge, SerializedEdge } from './edge';
-import { Node, SerializedNode } from './node';
+import { AbstractNode, Node, SerializedNode } from './node';
 
 import { uuid } from './utils/uuid';
 
@@ -16,6 +16,11 @@ export interface SerializedGraph {
     label: string;
     nodes: Record<string, SerializedNode>;
     edges: Record<string, SerializedEdge>;
+}
+
+export interface GraphContext {
+    engine: Engine;
+    graph: Graph;
 }
 
 export class Graph {
@@ -42,11 +47,11 @@ export class Graph {
         return this._edgeMap.get(id);
     }
 
-    getOutgoingEdges(node: Node): Edge[] {
+    getOutgoingEdges(node: AbstractNode): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.from === node.id);
     }
 
-    getIncomingEdges(node: Node): Edge[] {
+    getIncomingEdges(node: AbstractNode): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.to === node.id);
     }
 
@@ -94,7 +99,7 @@ export class Graph {
         const { id, size, label, _nodeMap, _edgeMap } = this;
 
         const nodes = Object.fromEntries(
-            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON()]),
+            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON() as SerializedNode]),
         );
         const edges = Object.fromEntries(
             Array.from(_edgeMap.values()).map((edge) => [edge.id, edge.toJSON()]),
@@ -118,7 +123,7 @@ export class Graph {
         const graphCtx = { ...ctx, graph };
 
         for (const [id, serializedNode] of Object.entries(json.nodes)) {
-            const node = Node.fromJSON(serializedNode, graphCtx);
+            const node = AbstractNode.fromJSON(serializedNode, graphCtx);
             graph._nodeMap.set(id, node);
         }
 

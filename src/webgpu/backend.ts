@@ -1,7 +1,7 @@
 import { WebGpuTexture } from './texture';
 import { createCompiledShader } from './pipeline';
 
-import type { Backend, CompilerShader, ShaderDescriptor, TextureConfig } from '../types';
+import type { Backend, CompilerShader, ShaderDescriptor, Texture, TextureConfig } from '../types';
 import { createPreviewRenderer, PreviewRenderer } from './preview-renderer';
 
 interface WebGPUBackendConfig {
@@ -52,6 +52,17 @@ export class WebGPUBackend implements Backend {
         return new WebGpuTexture(this.#device, {
             ...config,
         });
+    }
+
+    copyImageToTexture(source: ImageBitmap, texture: Texture): void {
+        this.#device.queue.copyExternalImageToTexture(
+            { source },
+            { texture: (texture as WebGpuTexture).gpuTexture },
+            {
+                width: source.width,
+                height: source.height,
+            },
+        );
     }
 
     async compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader> {

@@ -1,4 +1,5 @@
 import { WebGPUBackend, createFloat3, UNIFORM_COLOR, INVERT, createEngine } from '../src/main';
+import { BuiltInNodeType } from '../src/node';
 import { createPreviewCanvas } from './utils';
 
 const backend = await WebGPUBackend.create();
@@ -15,20 +16,34 @@ const graph = engine.loadGraph({
     size: 512,
     label: 'Test Graph',
     nodes: {
+        // A: {
+        //     id: 'A',
+        //     type: 'shader',
+        //     shader: UNIFORM_COLOR.id,
+        //     properties: {
+        //         color: createFloat3([1, 0, 0]),
+        //     },
+        // },
         A: {
             id: 'A',
+            type: 'builtin',
+            nodeType: BuiltInNodeType.Bitmap,
             properties: {
-                color: createFloat3([1, 0, 0]),
+                source: {
+                    type: 'string',
+                    value: 'https://placekitten.com/512/512',
+                },
             },
-            shader: UNIFORM_COLOR.id,
         },
         B: {
             id: 'B',
+            type: 'shader',
             properties: {},
             shader: INVERT.id,
         },
         C: {
             id: 'C',
+            type: 'shader',
             properties: {},
             shader: INVERT.id,
         },

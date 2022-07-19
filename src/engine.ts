@@ -1,3 +1,4 @@
+import { loadBitmapToTexture } from './builtins/bitmap';
 import { Graph } from './graph';
 
 import type { CompilerShader, Engine, EngineConfig, ShaderDescriptor } from './types';
@@ -31,21 +32,22 @@ export function createEngine(config: EngineConfig): Engine {
 
             await Promise.all(
                 nodes.map(async (node) => {
-                    const { shader } = node;
+                    if (node.type !== 'shader') {
+                        return Promise.resolve();
+                    }
 
-                    let shaderCompiledPromise = compiledShaderPromiseMap.get(shader);
+                    const shaderDescriptor = shaderMap.get(node.shader)!;
+                    let shaderCompiledPromise = compiledShaderPromiseMap.get(shaderDescriptor);
 
                     if (!shaderCompiledPromise) {
-                        const descriptor = shaderMap.get(shader.id)!;
-
                         shaderCompiledPromise = backend
-                            .compileShader(descriptor)
+                            .compileShader(shaderDescriptor)
                             .then((compilerShader) => {
-                                compiledShaderMap.set(shader, compilerShader);
+                                compiledShaderMap.set(shaderDescriptor, compilerShader);
                                 return compilerShader;
                             });
 
-                        compiledShaderPromiseMap.set(shader, shaderCompiledPromise);
+                        compiledShaderPromiseMap.set(shaderDescriptor, shaderCompiledPromise);
                     }
 
                     return shaderCompiledPromise;
@@ -53,13 +55,25 @@ export function createEngine(config: EngineConfig): Engine {
             );
 
             for (const node of nodes) {
-                const compiledShader = compiledShaderMap.get(node.shader)!;
+                if (node.type === 'shader') {
+                    const shaderDescriptor = shaderMap.get(node.shader)!;
+                    const compiledShader = compiledShaderMap.get(shaderDescriptor)!;
 
-                const properties = node.getProperties();
-                const inputs = node.getInputs();
-                const outputs = node.getOutputs();
+                    const properties = node.getProperties();
+                    const inputs = node.getInputs();
+                    const outputs = node.getOutputs();
 
-                compiledShader.render(properties, inputs, outputs);
+                    compiledShader.render(properties, inputs, outputs);
+                } else if (node.type === 'builtin') {
+                    const properties = node.getProperties();
+                    const outputs = node.getOutputs();
+
+                    await loadBitmapToTexture(
+                        backend,
+                        properties.source.value as string,
+                        outputs.output,
+                    );
+                }
             }
 
             return backend.waitUntilDone();

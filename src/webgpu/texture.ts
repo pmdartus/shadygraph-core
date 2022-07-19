@@ -17,7 +17,9 @@ export class WebGpuTexture implements Texture {
         {
             label,
             size,
-            usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT,
+            usage = GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
             type = 'color',
         }: WebGPUTextureConfig,
     ) {
