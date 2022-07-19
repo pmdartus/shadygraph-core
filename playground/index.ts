@@ -1,4 +1,4 @@
-import { WebGPUBackend, createFloat3, UNIFORM_COLOR, INVERT, createEngine } from '../src/main';
+import { WebGPUBackend, UNIFORM_COLOR, INVERT, createEngine } from '../src/main';
 import { BuiltInNodeType } from '../src/node';
 import { createPreviewCanvas } from './utils';
 
