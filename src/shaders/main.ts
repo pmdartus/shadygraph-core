@@ -1,4 +1,6 @@
-export { GRADIENT_AXIAL } from './gradient-axial';
-export { GRADIENT_RADIAL } from './gradient-radial';
-export { INVERT } from './invert';
-export { UNIFORM_COLOR } from './uniform-color';
+import { GRADIENT_AXIAL } from './gradient-axial';
+import { GRADIENT_RADIAL } from './gradient-radial';
+import { INVERT } from './invert';
+import { UNIFORM_COLOR } from './uniform-color';
+
+export const shaders = [GRADIENT_AXIAL, GRADIENT_RADIAL, INVERT, UNIFORM_COLOR];

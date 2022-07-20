@@ -113,12 +113,10 @@ export interface Backend {
 
 export interface EngineConfig {
     backend: Backend;
-    shaders?: ShaderDescriptor[];
 }
 
 export interface Engine {
     backend: Backend;
-    registerShader(descriptor: ShaderDescriptor): void;
     getShaderDescriptor(id: string): ShaderDescriptor | undefined;
     createGraph(config: GraphConfig): Graph;
     loadGraph(serializedGraph: SerializedGraph): Graph;

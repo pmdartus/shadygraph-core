@@ -1,32 +1,20 @@
-import {
-    WebGPUBackend,
-    UNIFORM_COLOR,
-    INVERT,
-    createEngine,
-    Graph,
-    SerializedGraph,
-} from '../src/main';
-import { createPreviewCanvas } from './utils';
+import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '../src/main';
+
+const examples = import.meta.glob<SerializedGraph>('./examples/*.json', {
+    as: 'json',
+    eager: true,
+});
 
 const select = document.querySelector('select')!;
 const root = document.querySelector('#container')!;
 
 const backend = await WebGPUBackend.create();
-
 const engine = createEngine({
     backend,
 });
 
-engine.registerShader(UNIFORM_COLOR);
-engine.registerShader(INVERT);
-
-async function fetchGraph(id: string): Promise<SerializedGraph> {
-    const response = await fetch(`/examples/${id}.json`);
-    return response.json();
-}
-
 async function renderExample(id: string) {
-    const data = await fetchGraph(id);
+    const data = examples[id];
     const graph = engine.loadGraph(data);
 
     await engine.renderGraph(graph);
@@ -60,6 +48,36 @@ function renderPreviews(graph: Graph) {
     }
 }
 
+function createPreviewCanvas(target: HTMLElement, size: number): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    target.appendChild(canvas);
+
+    canvas.width = 512;
+    canvas.height = 512;
+
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+
+    return canvas;
+}
+
+function setupSelectDropdown() {
+    for (const [key, value] of Object.entries(examples)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = (value as any).label;
+        select.appendChild(option);
+    }
+    select.firstElementChild?.setAttribute('selected', '');
+
+    select.addEventListener('change', () => {
+        const { value } = select;
+
+        updateQueyString({ id: value });
+        renderExample(value);
+    });
+}
+
 function updateQueyString({ id, replace = false }: { id: string; replace?: boolean }) {
     const updatedUrl = new URL(window.location.href);
     updatedUrl.searchParams.set('example', id);
@@ -74,6 +92,8 @@ function updateQueyString({ id, replace = false }: { id: string; replace?: boole
 function run() {
     const url = new URL(window.location.href);
 
+    setupSelectDropdown();
+
     let example = url.searchParams.get('example');
     if (example) {
         select.value = example;
@@ -81,13 +101,6 @@ function run() {
         example = select.value;
         updateQueyString({ id: example, replace: true });
     }
-
-    select.addEventListener('change', () => {
-        const { value } = select;
-
-        updateQueyString({ id: value });
-        renderExample(value);
-    });
 
     renderExample(example);
 }

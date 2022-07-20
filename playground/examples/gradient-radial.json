@@ -1,0 +1,44 @@
+{
+    "id": "gradient-axial",
+    "label": "Gradient Axial",
+    "size": 512,
+    "nodes": {
+        "A": {
+            "id": "A",
+            "type": "shader",
+            "shader": "#gradient-radial",
+            "properties": {}
+        },
+        "B": {
+            "id": "B",
+            "type": "shader",
+            "shader": "#gradient-radial",
+            "properties": {
+                "center": {
+                    "type": "float2",
+                    "value": [0, 0]
+                },
+                "radius": {
+                    "type": "float1",
+                    "value": [1]
+                }
+            }
+        },
+        "C": {
+            "id": "C",
+            "type": "shader",
+            "shader": "#gradient-radial",
+            "properties": {
+                "center": {
+                    "type": "float2",
+                    "value": [0.5, 0.5]
+                },
+                "radius": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        }
+    },
+    "edges": {}
+}

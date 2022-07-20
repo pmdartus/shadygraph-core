@@ -1,13 +1,14 @@
-import { loadBitmapToTexture } from './builtins/bitmap';
 import { Graph } from './graph';
+import { shaders } from './shaders/main';
+import { loadBitmapToTexture } from './builtins/bitmap';
 
 import type { CompilerShader, Engine, EngineConfig, ShaderDescriptor } from './types';
 
 export function createEngine(config: EngineConfig): Engine {
-    const { shaders, backend } = config;
+    const { backend } = config;
 
     const shaderMap = new Map<string, ShaderDescriptor>(
-        shaders?.map((shader) => [shader.id, shader]),
+        shaders.map((shader) => [shader.id, shader]),
     );
 
     const compiledShaderMap = new Map<ShaderDescriptor, CompilerShader>();
@@ -17,9 +18,6 @@ export function createEngine(config: EngineConfig): Engine {
         backend,
         createGraph(config) {
             return Graph.create(config, { engine });
-        },
-        registerShader(shader) {
-            shaderMap.set(shader.id, shader);
         },
         getShaderDescriptor(id) {
             return shaderMap.get(id);
