@@ -1,6 +1,6 @@
 {
-    "id": "gradient-axial",
-    "label": "Gradient Axial",
+    "id": "gradient-radial",
+    "label": "Gradient Radial",
     "size": 512,
     "nodes": {
         "A": {

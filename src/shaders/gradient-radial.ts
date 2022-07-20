@@ -2,6 +2,8 @@ import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
 
 const SOURCE = wgsl`
+    const POINT_SIZE = 0.03;
+
     fn run(coordinate: vec2<f32>) -> Output {
         var value = 1.0 - distance(coordinate, config.center) / config.radius;
         return Output(value);
