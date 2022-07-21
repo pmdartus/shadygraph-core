@@ -64,14 +64,14 @@ export class Edge implements EdgeInterface {
 export function isValidEdge(
     config: EdgeConfig,
     graph: Graph,
-): { isValid: boolean; reason?: string } {
+): { isValid: true } | { isValid: false; reason: string } {
     const fromNode = graph.getNode(config.from);
     if (!fromNode) {
         return { isValid: false, reason: `No node found with id ${config.from}` };
     }
 
-    const output = fromNode.getOutputs()[config.fromPort];
-    if (!output) {
+    const fromDescriptor = fromNode.descriptor;
+    if (!Object.hasOwn(fromDescriptor.outputs, config.fromPort)) {
         return { isValid: false, reason: `No output found with name ${config.fromPort}` };
     }
 
@@ -80,8 +80,8 @@ export function isValidEdge(
         return { isValid: false, reason: `No node found with id ${config.to}` };
     }
 
-    const input = toNode.getInputs()[config.toPort];
-    if (!input) {
+    const toDescriptor = toNode.descriptor;
+    if (!Object.hasOwn(toDescriptor.inputs, config.toPort)) {
         return { isValid: false, reason: `No input found with name ${config.toPort}` };
     }
 
@@ -91,6 +91,8 @@ export function isValidEdge(
     if (isInputAlreadyConnected) {
         return { isValid: false, reason: `Input ${config.toPort} is already connected` };
     }
+
+    // TODO: Add cycle detection.
 
     return { isValid: true };
 }

@@ -17,7 +17,11 @@ async function renderExample(id: string) {
     const data = examples[id];
     const graph = engine.loadGraph(data);
 
+    console.log(`Loaded graph: ${id}`);
+
     await engine.renderGraph(graph);
+
+    console.log(`Rendered graph: ${id}`);
 
     renderPreviews(graph);
 }

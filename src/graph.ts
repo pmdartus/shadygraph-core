@@ -129,8 +129,10 @@ export class Graph {
 
         for (const [id, serializedEdge] of Object.entries(json.edges)) {
             const edge = Edge.fromJSON(serializedEdge, graphCtx);
-            if (!isValidEdge(edge, graph)) {
-                throw new Error(`Invalid edge: ${JSON.stringify(serializedEdge)}`);
+
+            const validationResult = isValidEdge(edge, graph);
+            if (!validationResult.isValid) {
+                throw new Error(`Invalid edge: ${validationResult.reason}`);
             }
 
             graph._edgeMap.set(id, edge);

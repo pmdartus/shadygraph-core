@@ -10,7 +10,7 @@
             "properties": {
                 "source": {
                     "type": "string",
-                    "value": "https://placekitten.com/512/512"
+                    "value": "/assets/mona-lisa.jpeg"
                 }
             }
         },

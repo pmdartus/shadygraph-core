@@ -130,6 +130,7 @@ export async function createCompiledShader(
                     renderPass.setPipeline(pipeline);
                     renderPass.setBindGroup(0, propertiesBindGroup);
                     for (let i = 0; i < pipelineInputs.length; i++) {
+                        // TODO: Handle cases where the input is not provided.
                         renderPass.setBindGroup(
                             i + 1,
                             device.createBindGroup({

@@ -1,0 +1,334 @@
+{
+    "id": "blend",
+    "label": "Blend",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "PearlEarring": {
+            "id": "PearlEarring",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/pearl-earring.jpeg"
+                }
+            }
+        },
+        "Default": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {}
+        },
+        "Normal": {
+            "id": "Normal",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [0]
+                },
+                "opacity": {
+                    "type": "float1",
+                    "value": [0.7]
+                }
+            }
+        },
+        "Add": {
+            "id": "Add",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [1]
+                }
+            }
+        },
+        "Subtract": {
+            "id": "Subtract",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [2]
+                }
+            }
+        },
+        "Multiply": {
+            "id": "Multiply",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [3]
+                }
+            }
+        },
+        "Multiply_Opacity": {
+            "id": "Multiply_Opacity",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [3]
+                },
+                "opacity": {
+                    "type": "float1",
+                    "value": [0.8]
+                }
+            }
+        },
+        "Divide": {
+            "id": "Divide",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [4]
+                }
+            }
+        },
+        "AddSub": {
+            "id": "AddSub",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [5]
+                }
+            }
+        },
+        "Max": {
+            "id": "Max",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [6]
+                }
+            }
+        },
+        "Min": {
+            "id": "Min",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [7]
+                }
+            }
+        },
+        "Overlay": {
+            "id": "Overlay",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [8]
+                }
+            }
+        },
+        "Screen": {
+            "id": "Screen",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [9]
+                }
+            }
+        }
+    },
+    "edges": {
+        "MonaLisa-Default": {
+            "id": "MonaLisa-Default",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Default",
+            "toPort": "background"
+        },
+        "PearlEarring-Default": {
+            "id": "PearlEarring-Default",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Default",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Normal": {
+            "id": "MonaLisa-Normal",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Normal",
+            "toPort": "background"
+        },
+        "PearlEarring-Normal": {
+            "id": "PearlEarring-Normal",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Normal",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Add": {
+            "id": "MonaLisa-Add",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Add",
+            "toPort": "background"
+        },
+        "PearlEarring-Add": {
+            "id": "PearlEarring-Add",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Add",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Subtract": {
+            "id": "MonaLisa-Subtract",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Subtract",
+            "toPort": "background"
+        },
+        "PearlEarring-Subtract": {
+            "id": "PearlEarring-Subtract",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Subtract",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Multiply": {
+            "id": "MonaLisa-Multiply",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Multiply",
+            "toPort": "background"
+        },
+        "PearlEarring-Multiply": {
+            "id": "PearlEarring-Multiply",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Multiply",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Multiply_Opacity": {
+            "id": "MonaLisa-Multiply_Opacity",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Multiply_Opacity",
+            "toPort": "background"
+        },
+        "PearlEarring-Multiply_Opacity": {
+            "id": "PearlEarring-Multiply_Opacity",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Multiply_Opacity",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Divide": {
+            "id": "MonaLisa-Divide",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Divide",
+            "toPort": "background"
+        },
+        "PearlEarring-Divide": {
+            "id": "PearlEarring-Divide",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Divide",
+            "toPort": "foreground"
+        },
+        "MonaLisa-AddSub": {
+            "id": "MonaLisa-AddSub",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "AddSub",
+            "toPort": "background"
+        },
+        "PearlEarring-AddSub": {
+            "id": "PearlEarring-AddSub",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "AddSub",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Max": {
+            "id": "MonaLisa-Max",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Max",
+            "toPort": "background"
+        },
+        "PearlEarring-Max": {
+            "id": "PearlEarring-Max",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Max",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Min": {
+            "id": "MonaLisa-Min",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Min",
+            "toPort": "background"
+        },
+        "PearlEarring-Min": {
+            "id": "PearlEarring-Min",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Min",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Overlay": {
+            "id": "MonaLisa-Overlay",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Overlay",
+            "toPort": "background"
+        },
+        "PearlEarring-Overlay": {
+            "id": "PearlEarring-Overlay",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Overlay",
+            "toPort": "foreground"
+        },
+        "MonaLisa-Screen": {
+            "id": "MonaLisa-Screen",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Screen",
+            "toPort": "background"
+        },
+        "PearlEarring-Screen": {
+            "id": "PearlEarring-Screen",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Screen",
+            "toPort": "foreground"
+        }
+    }
+}
