@@ -1,0 +1,118 @@
+{
+    "id": "mirror",
+    "label": "Mirror",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "MirrorX": {
+            "id": "MirrorX",
+            "type": "shader",
+            "shader": "#mirror",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [0]
+                }
+            }
+        },
+        "MirrorX_Offset1": {
+            "id": "MirrorX_Offset1",
+            "type": "shader",
+            "shader": "#mirror",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [0]
+                },
+                "x_offset": {
+                    "type": "float1",
+                    "value": [0.2]
+                }
+            }
+        },
+        "MirrorX_Offset2": {
+            "id": "MirrorX_Offset2",
+            "type": "shader",
+            "shader": "#mirror",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [0]
+                },
+                "x_offset": {
+                    "type": "float1",
+                    "value": [0.8]
+                }
+            }
+        },
+        "MirrorY": {
+            "id": "MirrorY",
+            "type": "shader",
+            "shader": "#mirror",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [1]
+                }
+            }
+        },
+        "MirrorXY": {
+            "id": "MirrorXY",
+            "type": "shader",
+            "shader": "#mirror",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [2]
+                }
+            }
+        }
+    },
+    "edges": {
+        "MonaLisa_MirrorX": {
+            "id": "MonaLisa_MirrorX",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "MirrorX",
+            "toPort": "input"
+        },
+        "MonaLisa_MirrorX_Offset1": {
+            "id": "MonaLisa_MirrorX_Offset1",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "MirrorX_Offset1",
+            "toPort": "input"
+        },
+        "MonaLisa_MirrorX_Offset2": {
+            "id": "MonaLisa_MirrorX_Offset2",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "MirrorX_Offset2",
+            "toPort": "input"
+        },
+        "MonaLisa_MirrorY": {
+            "id": "MonaLisa_MirrorY",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "MirrorY",
+            "toPort": "input"
+        },
+        "MonaLisa_MirrorXY": {
+            "id": "MonaLisa_MirrorXY",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "MirrorXY",
+            "toPort": "input"
+        }
+    }
+}

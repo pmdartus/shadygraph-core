@@ -94,7 +94,7 @@ export const BLEND: ShaderDescriptor = {
             label: 'Blending Mode',
             type: 'int1',
             description: 'Set the blending mode.',
-            default: [0],
+            default: [BLEND_MODE_MAPPING.Normal],
         },
     },
     inputs: {
