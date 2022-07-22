@@ -1,0 +1,47 @@
+{
+    "id": "square",
+    "label": "Square",
+    "size": 512,
+    "nodes": {
+        "Default": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#square",
+            "properties": {}
+        },
+        "Size_S": {
+            "id": "Size_S",
+            "type": "shader",
+            "shader": "#square",
+            "properties": {
+                "size": {
+                    "type": "float1",
+                    "value": [0.1]
+                }
+            }
+        },
+        "Size_M": {
+            "id": "Size_M",
+            "type": "shader",
+            "shader": "#square",
+            "properties": {
+                "size": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        },
+        "Size_L": {
+            "id": "Size_L",
+            "type": "shader",
+            "shader": "#square",
+            "properties": {
+                "size": {
+                    "type": "float1",
+                    "value": [1.1]
+                }
+            }
+        }
+    },
+    "edges": {}
+}
