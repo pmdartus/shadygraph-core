@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {
@@ -8,7 +8,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const INVERT: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#invert',
     label: 'Invert',
     source: SOURCE,
@@ -32,4 +32,4 @@ export const INVERT: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});

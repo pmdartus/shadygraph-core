@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {
@@ -8,7 +8,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const GRAYSCALE_TO_COLOR: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#grayscale-to-color',
     label: 'Grayscale to Color',
     source: SOURCE,
@@ -33,4 +33,4 @@ export const GRAYSCALE_TO_COLOR: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});

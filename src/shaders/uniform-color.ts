@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const UNIFORM_COLOR_SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {
@@ -11,7 +11,7 @@ const UNIFORM_COLOR_SOURCE = wgsl`
     }
 `;
 
-export const UNIFORM_COLOR: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#uniform-color',
     label: 'Uniform Color',
     source: UNIFORM_COLOR_SOURCE,
@@ -30,4 +30,4 @@ export const UNIFORM_COLOR: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});

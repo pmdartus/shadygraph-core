@@ -1,7 +1,7 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
 
 import { colorHelpers } from './shared/color';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     ${colorHelpers}
@@ -12,7 +12,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const COLOR_TO_GRAYSCALE: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#color-to-grayscale',
     label: 'Color to Grayscale',
     source: SOURCE,
@@ -37,4 +37,4 @@ export const COLOR_TO_GRAYSCALE: ShaderDescriptor = {
             type: 'grayscale',
         },
     },
-};
+});

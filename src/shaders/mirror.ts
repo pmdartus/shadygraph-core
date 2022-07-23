@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const MIRROR_MODE_MAPPING = {
     X_AXIS: 0,
@@ -35,7 +35,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const MIRROR: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#mirror',
     label: 'Mirror',
     source: SOURCE,
@@ -71,4 +71,4 @@ export const MIRROR: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});

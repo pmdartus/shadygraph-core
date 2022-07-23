@@ -1,7 +1,7 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
 
 import { colorHelpers } from './shared/color';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const BLEND_MODE_MAPPING = {
     Normal: 0,
@@ -79,7 +79,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const BLEND: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#blend',
     label: 'Blend',
     source: SOURCE,
@@ -118,4 +118,4 @@ export const BLEND: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});

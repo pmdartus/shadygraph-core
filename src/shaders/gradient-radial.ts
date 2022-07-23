@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     const POINT_SIZE = 0.03;
@@ -10,7 +10,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const GRADIENT_RADIAL: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#gradient-radial',
     label: 'Gradient Radial',
     source: SOURCE,
@@ -35,4 +35,4 @@ export const GRADIENT_RADIAL: ShaderDescriptor = {
             type: 'grayscale',
         },
     },
-};
+});

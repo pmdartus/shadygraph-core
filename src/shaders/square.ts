@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     const CENTER = vec2<f32>(0.5, 0.5);
@@ -14,7 +14,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const SQUARE: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#square',
     label: 'Square',
     source: SOURCE,
@@ -33,4 +33,4 @@ export const SQUARE: ShaderDescriptor = {
             type: 'grayscale',
         },
     },
-};
+});

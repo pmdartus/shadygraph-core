@@ -1,5 +1,5 @@
-import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
+import { createShaderDescriptor } from './shared/shader-descriptor';
 
 const SOURCE = wgsl`
     const POINT_SIZE = 0.03;
@@ -22,7 +22,7 @@ const SOURCE = wgsl`
     }
 `;
 
-export const GRADIENT_AXIAL: ShaderDescriptor = {
+export default createShaderDescriptor({
     id: '#gradient-axial',
     label: 'Gradient Axial',
     source: SOURCE,
@@ -47,4 +47,4 @@ export const GRADIENT_AXIAL: ShaderDescriptor = {
             type: 'color',
         },
     },
-};
+});
