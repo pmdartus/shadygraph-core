@@ -1,0 +1,28 @@
+{
+    "id": "grayscal-to-color",
+    "label": "Grayscale to color",
+    "size": 512,
+    "nodes": {
+        "Disc": {
+            "id": "Disc",
+            "type": "shader",
+            "shader": "#disc",
+            "properties": {}
+        },
+        "Grayscale_Color": {
+            "id": "Grayscale_Color",
+            "type": "shader",
+            "shader": "#grayscale-to-color",
+            "properties": {}
+        }
+    },
+    "edges": {
+        "Disc_Grayscale_Color": {
+            "id": "Disc_Grayscale_Color",
+            "from": "Disc",
+            "fromPort": "output",
+            "to": "Grayscale_Color",
+            "toPort": "input"
+        }
+    }
+}

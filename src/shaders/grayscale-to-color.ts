@@ -3,27 +3,28 @@ import { wgsl } from '../utils/wgsl';
 
 const SOURCE = wgsl`
     fn run(coordinate: vec2<f32>) -> Output {
-        var val = textureSample(input_texture, input_sampler, coordinate);
-        return Output(vec4<f32>(val.rbg * vec3<f32>(-1.0) + vec3<f32>(1.0), val.a));
+        var val = textureSample(input_texture, input_sampler, coordinate).r;
+        return Output(vec4<f32>(val, val, val, 1.0));
     }
 `;
 
-export const INVERT: ShaderDescriptor = {
-    id: '#invert',
-    label: 'Invert',
+export const GRAYSCALE_TO_COLOR: ShaderDescriptor = {
+    id: '#grayscale-to-color',
+    label: 'Grayscale to Color',
     source: SOURCE,
     properties: {
-        enabled: {
-            label: 'Enabled',
+        // TODO: Hanlde case where shader defines no properties.
+        placeholder: {
+            label: 'placeholder',
             type: 'boolean',
-            description: 'Does invert the input if enabled.',
+            description: 'Placeholder.',
             default: true,
         },
     },
     inputs: {
         input: {
             label: 'Input',
-            type: 'color',
+            type: 'grayscale',
         },
     },
     outputs: {

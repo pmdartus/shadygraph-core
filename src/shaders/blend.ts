@@ -1,6 +1,8 @@
 import { ShaderDescriptor } from '../types';
 import { wgsl } from '../utils/wgsl';
 
+import { colorHelpers } from './shared/color';
+
 const BLEND_MODE_MAPPING = {
     Normal: 0,
     Add: 1,
@@ -17,9 +19,7 @@ const BLEND_MODE_MAPPING = {
 // https://en.wikipedia.org/wiki/Blend_modes
 // https://substance3d.adobe.com/documentation/sddoc/blending-modes-description-132120605.html
 const SOURCE = wgsl`
-    fn rgb_to_gray(val: vec3<f32>) -> f32 {
-        return 0.299 * val.r + 0.587 * val.g + 0.114 * val.b;
-    }
+    ${colorHelpers}
 
     fn run(coordinate: vec2<f32>) -> Output {
         var foreground = textureSample(foreground_texture, foreground_sampler, coordinate).rgb;
@@ -44,7 +44,7 @@ const SOURCE = wgsl`
                 output = background / foreground;
             }
             case ${BLEND_MODE_MAPPING.AddSub}: {
-                if rgb_to_gray(foreground) > 0.5 {
+                if rgb_to_grayscale(foreground) > 0.5 {
                     output = background + foreground;
                 } else {
                     output = background - foreground;
@@ -57,7 +57,7 @@ const SOURCE = wgsl`
                 output = min(background, foreground);
             }
             case ${BLEND_MODE_MAPPING.Overlay}: {
-                if rgb_to_gray(background) < 0.5 {
+                if rgb_to_grayscale(background) < 0.5 {
                     output = 2 * background * foreground;
                 } else {
                     output = vec3<f32>(1.0) - 2 * (vec3<f32>(1) - background) * (vec3<f32>(1) - foreground);

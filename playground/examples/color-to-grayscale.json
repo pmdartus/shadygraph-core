@@ -1,0 +1,33 @@
+{
+    "id": "color-to-grayscale",
+    "label": "Color to grayscale",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "Color_GrayScale": {
+            "id": "Color_GrayScale",
+            "type": "shader",
+            "shader": "#color-to-grayscale",
+            "properties": {}
+        }
+    },
+    "edges": {
+        "MonaLisa_Color_GrayScale": {
+            "id": "MonaLisa_Color_GrayScale",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Color_GrayScale",
+            "toPort": "input"
+        }
+    }
+}
