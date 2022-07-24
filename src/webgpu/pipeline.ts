@@ -2,16 +2,19 @@ import { wgsl } from '../utils/wgsl';
 
 import { WebGpuTexture } from './texture';
 import { createShaderModule } from './module';
-import { PropertiesBuffer } from './properties';
+import { ShaderConfig } from './shader-config';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
 import type { Value, ShaderDescriptor, CompilerShader, PropertyType, ShaderIOType } from '../types';
+import { createFloat1 } from '../value';
 
 export async function createCompiledShader(
     device: GPUDevice,
     shader: ShaderDescriptor,
 ): Promise<CompilerShader> {
     const { id } = shader;
+
+    const shaderConfig = ShaderConfig.create(device, shader);
 
     const vertexShaderModule = await createShaderModule(device, {
         label: `ShaderModule:Vertex:${id}`,
@@ -20,10 +23,8 @@ export async function createCompiledShader(
 
     const fragmentShaderModule = await createShaderModule(device, {
         label: `ShaderModule:Fragment:${id}`,
-        code: getShaderSource(shader),
+        code: getShaderSource(shader, shaderConfig),
     });
-
-    const propertiesBuffer = new PropertiesBuffer(device, shader);
 
     const propertiesBindGroupLayout = device.createBindGroupLayout({
         label: `Properties:${id}`,
@@ -45,7 +46,7 @@ export async function createCompiledShader(
             {
                 binding: 0,
                 resource: {
-                    buffer: propertiesBuffer.buffer,
+                    buffer: shaderConfig.buffer,
                 },
             },
         ],
@@ -114,7 +115,12 @@ export async function createCompiledShader(
             inputs: Record<string, WebGpuTexture>,
             outputs: Record<string, WebGpuTexture>,
         ): void {
-            propertiesBuffer.writePropertiesBuffer(properties);
+            shaderConfig.writePropertiesBuffer(
+                {
+                    seed: createFloat1([0]),
+                },
+                properties,
+            );
 
             const encoder = device.createCommandEncoder();
             {
@@ -159,21 +165,13 @@ export async function createCompiledShader(
         },
 
         destroy() {
-            propertiesBuffer.destroy();
+            shaderConfig.destroy();
         },
     };
 }
 
-function getShaderSource(shader: ShaderDescriptor): string {
-    const configStruct = wgsl`
-        struct Config {
-            ${Object.entries(shader.properties).map(
-                ([key, prop], index) =>
-                    `@location(${index}) ${key} : ${propertyTypeToWgslType(prop)},`,
-            )}
-        };
-    `;
-
+function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string {
+    const configStruct = config.toWgsl();
     const structBinding = wgsl`@group(0) @binding(0) var<uniform> config: Config;`;
 
     const inputsBindings = Object.keys(shader.inputs).map(

@@ -16,15 +16,7 @@ export default createShaderDescriptor({
     id: '#color-to-grayscale',
     label: 'Color to Grayscale',
     source: SOURCE,
-    properties: {
-        // TODO: Hanlde case where shader defines no properties.
-        placeholder: {
-            label: 'placeholder',
-            type: 'boolean',
-            description: 'Placeholder.',
-            default: true,
-        },
-    },
+    properties: {},
     inputs: {
         input: {
             label: 'Input',
