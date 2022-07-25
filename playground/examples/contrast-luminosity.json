@@ -1,0 +1,105 @@
+{
+    "id": "contrast-luminosity",
+    "label": "Constrast/Luminosity",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "Default": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#contrast-luminosity",
+            "properties": {}
+        },
+        "Luminosity-Plus": {
+            "id": "Luminosity-Plus",
+            "type": "shader",
+            "shader": "#contrast-luminosity",
+            "properties": {
+                "luminosity": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        },
+        "Luminosity-Minus": {
+            "id": "Luminosity-Minus",
+            "type": "shader",
+            "shader": "#contrast-luminosity",
+            "properties": {
+                "luminosity": {
+                    "type": "float1",
+                    "value": [-0.2]
+                }
+            }
+        },
+        "Contrast-Plus": {
+            "id": "Contrast-Plus",
+            "type": "shader",
+            "shader": "#contrast-luminosity",
+            "properties": {
+                "contrast": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        },
+        "Contrast-Minus": {
+            "id": "Contrast-Minus",
+            "type": "shader",
+            "shader": "#contrast-luminosity",
+            "properties": {
+                "contrast": {
+                    "type": "float1",
+                    "value": [-0.5]
+                }
+            }
+        }
+    },
+    "edges": {
+        "MonaLisa_Default": {
+            "id": "MonaLisa_Default",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Default",
+            "toPort": "input"
+        },
+        "MonaLisa_Luminosity-Plus": {
+            "id": "MonaLisa_Luminosity-Plus",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Luminosity-Plus",
+            "toPort": "input"
+        },
+        "MonaLisa_Luminosity-Minus": {
+            "id": "MonaLisa_Luminosity-Minus",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Luminosity-Minus",
+            "toPort": "input"
+        },
+        "MonaLisa_Contrast-Plus": {
+            "id": "MonaLisa_Contrast-Plus",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Contrast-Plus",
+            "toPort": "input"
+        },
+        "MonaLisa_Contrast-Minus": {
+            "id": "MonaLisa_Contrast-Minus",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Contrast-Minus",
+            "toPort": "input"
+        }
+    }
+}

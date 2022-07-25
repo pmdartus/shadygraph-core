@@ -1,6 +1,5 @@
-import { propertyTypeDefaultValue } from './shader-descriptor';
-
 import { Graph, GraphContext } from './graph';
+import { createValue } from './value';
 import { uuid } from './utils/uuid';
 
 import type { NodeDescriptor, Texture, Value } from './types';
@@ -50,7 +49,7 @@ export abstract class AbstractNode {
     getProperties(): Record<string, Value> {
         return Object.fromEntries(
             Object.entries(this.descriptor.properties).map(([name, property]) => {
-                const value = this.properties[name] ?? propertyTypeDefaultValue(property);
+                const value = this.properties[name] ?? createValue(property.type, property.default);
                 return [name, value];
             }),
         );

@@ -1,0 +1,47 @@
+{
+    "id": "checker",
+    "label": "Checker",
+    "size": 512,
+    "nodes": {
+        "Default": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#checker",
+            "properties": {}
+        },
+        "Tiling_2": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#checker",
+            "properties": {
+                "tiling": {
+                    "type": "int1",
+                    "value": [2]
+                }
+            }
+        },
+        "Tiling_10": {
+            "id": "Default",
+            "type": "shader",
+            "shader": "#checker",
+            "properties": {
+                "tiling": {
+                    "type": "int1",
+                    "value": [10]
+                }
+            }
+        },
+        "Rotate": {
+            "id": "Rotate",
+            "type": "shader",
+            "shader": "#checker",
+            "properties": {
+                "rotate_45": {
+                    "type": "boolean",
+                    "value": true
+                }
+            }
+        }
+    },
+    "edges": {}
+}
