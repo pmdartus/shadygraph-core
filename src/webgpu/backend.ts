@@ -84,7 +84,7 @@ export class WebGPUBackend implements Backend {
         }
 
         this.#previewRenderer.render({
-            source: texture.gpuTexture,
+            source: texture,
             target: context.getCurrentTexture(),
         });
     }

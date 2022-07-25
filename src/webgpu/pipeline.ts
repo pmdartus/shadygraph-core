@@ -206,34 +206,6 @@ function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string
     `;
 }
 
-function propertyTypeToWgslType(prop: PropertyType): string {
-    switch (prop.type) {
-        case 'boolean':
-            return 'u32';
-
-        case 'int1':
-            return 'u32';
-        case 'int2':
-            return 'vec2<u32>';
-        case 'int3':
-            return 'vec3<u32>';
-        case 'int4':
-            return 'vec4<u32>';
-
-        case 'float1':
-            return 'f32';
-        case 'float2':
-            return 'vec2<f32>';
-        case 'float3':
-            return 'vec3<f32>';
-        case 'float4':
-            return 'vec4<f32>';
-
-        case 'string':
-            throw new Error('String properties are not supported');
-    }
-}
-
 function ioTypeToWgslType(ioType: ShaderIOType): string {
     switch (ioType.type) {
         case 'grayscale':
