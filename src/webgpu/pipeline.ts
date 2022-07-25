@@ -1,12 +1,12 @@
 import { wgsl } from '../utils/wgsl';
+import { createFloat1 } from '../value';
 
 import { WebGpuTexture } from './texture';
 import { createShaderModule } from './module';
 import { ShaderConfig } from './shader-config';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
-import type { Value, ShaderDescriptor, CompilerShader, PropertyType, ShaderIOType } from '../types';
-import { createFloat1 } from '../value';
+import type { Value, ShaderDescriptor, CompilerShader, ShaderIOType } from '../types';
 
 export async function createCompiledShader(
     device: GPUDevice,
