@@ -33,6 +33,7 @@ export default createShaderDescriptor({
             description: 'Number of time the pattern repeats.',
             default: [1],
         },
+        // TODO: Add rotation
         rotate_45: {
             label: 'Rotate 45°',
             type: 'boolean',

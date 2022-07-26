@@ -1,0 +1,14 @@
+{
+    "id": "white-noise",
+    "label": "White Noise",
+    "size": 512,
+    "nodes": {
+        "Noise": {
+            "id": "Noise",
+            "type": "shader",
+            "shader": "#white-noise",
+            "properties": {}
+        }
+    },
+    "edges": {}
+}

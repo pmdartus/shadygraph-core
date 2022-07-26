@@ -117,7 +117,7 @@ export async function createCompiledShader(
         ): void {
             shaderConfig.writePropertiesBuffer(
                 {
-                    seed: createFloat1([0]),
+                    seed: createFloat1([1.2902]),
                 },
                 properties,
             );

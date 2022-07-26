@@ -10,6 +10,7 @@ import INVERT from './invert';
 import MIRROR from './mirror';
 import SQUARE from './square';
 import UNIFORM_COLOR from './uniform-color';
+import WHITE_NOISE from './whitenoise';
 
 export const shaders = [
     BLEND,
@@ -24,4 +25,5 @@ export const shaders = [
     MIRROR,
     SQUARE,
     UNIFORM_COLOR,
+    WHITE_NOISE,
 ];
