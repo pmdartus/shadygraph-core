@@ -23,7 +23,6 @@ export class WebGPUBackend implements Backend {
         this.#canvasTextureFormat = navigator.gpu.getPreferredCanvasFormat();
         this.#previewRenderer = createPreviewRenderer(this.#device, {
             format: this.#canvasTextureFormat,
-            textureType: 'color',
         });
     }
 

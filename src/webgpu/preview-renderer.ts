@@ -2,10 +2,14 @@ import { wgsl } from '../utils/wgsl';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
 import type { TextureType } from '../types';
-import { WebGpuTexture } from './texture';
+import type { WebGpuTexture } from './texture';
 
 interface PreviewRendererConfig {
     format: GPUTextureFormat;
+}
+
+export interface PreviewRenderer {
+    render(config: { source: WebGpuTexture; target: GPUTexture }): void;
 }
 
 const TEXTURE_TYPE_MAPPING: { [type in TextureType]: number } = {
@@ -34,10 +38,6 @@ const FRAGMENT_SHADER = wgsl`
         return value;
     }
 `;
-
-export interface PreviewRenderer {
-    render(config: { source: WebGpuTexture; target: GPUTexture }): void;
-}
 
 export function createPreviewRenderer(
     device: GPUDevice,
