@@ -71,18 +71,6 @@ export interface ShaderIOType {
     type: TextureType;
 }
 
-export interface NodeDescriptor {
-    properties: Record<string, PropertyType>;
-    inputs: Record<string, ShaderIOType>;
-    outputs: Record<string, ShaderIOType>;
-}
-
-export interface ShaderDescriptor extends NodeDescriptor {
-    id: string;
-    label: string;
-    source: string;
-}
-
 export interface CompilerShader {
     render(
         properties: Record<string, Value>,
@@ -122,4 +110,35 @@ export interface Engine {
     createGraph(config: GraphConfig): Graph;
     loadGraph(serializedGraph: SerializedGraph): Graph;
     renderGraph(graph: Graph): Promise<void>;
+}
+
+export interface NodeDescriptor {
+    properties: Record<string, PropertyType>;
+    inputs: Record<string, ShaderIOType>;
+    outputs: Record<string, ShaderIOType>;
+}
+
+export interface ShaderDescriptor extends NodeDescriptor {
+    id: string;
+    label: string;
+    source: string;
+}
+
+export interface ExecutionContext {
+    engine: Engine;
+    graph: Graph;
+    backend: Backend;
+}
+
+export interface Node {
+    id: string;
+    descriptor: NodeDescriptor;
+    getProperty<T extends Value>(name: string): T | null;
+    getProperties(): Record<string, Value>;
+    getInput(name: string): Texture | null;
+    getInputs(): Record<string, Texture | null>;
+    getOutput(name: string): Texture | null;
+    getOutputs(): Record<string, Texture>;
+    execute(ctx: ExecutionContext): void | Promise<void>;
+    toJSON(): any;
 }

@@ -1,14 +1,15 @@
 import { Edge, isValidEdge, SerializedEdge } from './edge';
-import { AbstractBaseNode, BuiltInNodeType, Node, SerializedNode, ShaderNode } from './node';
 
 import { uuid } from './utils/uuid';
 
+import { ShaderNode } from './shader-node';
+import { BuiltInNodeType } from './builtin-node';
 import { InputNode } from './builtins/input';
 import { OutputNode } from './builtins/output';
 import { BitmapNode } from './builtins/bitmap';
 import { SvgNode } from './builtins/svg';
 
-import type { Engine } from './types';
+import type { Engine, Node } from './types';
 
 export interface GraphConfig {
     size?: number;
@@ -19,7 +20,7 @@ export interface SerializedGraph {
     id: string;
     size: number;
     label: string;
-    nodes: Record<string, SerializedNode>;
+    nodes: Record<string, any>;
     edges: Record<string, SerializedEdge>;
 }
 
@@ -34,14 +35,12 @@ export class Graph {
     label: string;
     _nodeMap = new Map<string, Node>();
     _edgeMap = new Map<string, Edge>();
-    #engine: Engine;
 
     /** @internal */
-    constructor(config: { id: string; size: number; label: string; engine: Engine }) {
+    constructor(config: { id: string; size: number; label: string }) {
         this.id = config.id;
         this.size = config.size;
         this.label = config.label;
-        this.#engine = config.engine;
     }
 
     getNode(id: string): Node | undefined {
@@ -52,11 +51,11 @@ export class Graph {
         return this._edgeMap.get(id);
     }
 
-    getOutgoingEdges(node: AbstractBaseNode): Edge[] {
+    getOutgoingEdges(node: Node): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.from === node.id);
     }
 
-    getIncomingEdges(node: AbstractBaseNode): Edge[] {
+    getIncomingEdges(node: Node): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.to === node.id);
     }
 
@@ -65,7 +64,6 @@ export class Graph {
             id: this.id,
             size: this.size,
             label: this.label,
-            engine: this.#engine,
         });
 
         graph._nodeMap = new Map(this._nodeMap);
@@ -120,10 +118,7 @@ export class Graph {
     }
 
     static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): Graph {
-        const graph = new Graph({
-            ...json,
-            engine: ctx.engine,
-        });
+        const graph = new Graph(json);
 
         const graphCtx = { ...ctx, graph };
 
@@ -152,7 +147,7 @@ export class Graph {
                 }
             }
 
-            graph._nodeMap.set(id, node);
+            graph._nodeMap.set(id, node!);
         }
 
         for (const [id, serializedEdge] of Object.entries(json.edges)) {
@@ -169,12 +164,11 @@ export class Graph {
         return graph;
     }
 
-    static create(config: GraphConfig, ctx: { engine: Engine }): Graph {
+    static create(config: GraphConfig): Graph {
         return new Graph({
             id: uuid(),
             size: config.size ?? 512,
             label: config.label ?? '',
-            engine: ctx.engine,
         });
     }
 }

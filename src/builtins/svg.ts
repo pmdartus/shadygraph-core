@@ -1,6 +1,6 @@
-import { AbstractBuiltinNode, ExecutionContext } from '../node';
+import { AbstractBuiltinNode } from '../builtin-node';
 
-import type { Float4Value, NodeDescriptor, StringValue } from '../types';
+import type { ExecutionContext, Float4Value, NodeDescriptor, StringValue } from '../types';
 
 function loadImage(src: string): Promise<HTMLImageElement> {
     const img = new Image();

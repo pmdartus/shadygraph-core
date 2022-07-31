@@ -1,6 +1,6 @@
-import { AbstractBuiltinNode, ExecutionContext } from '../node';
+import { AbstractBuiltinNode } from '../builtin-node';
 
-import type { NodeDescriptor, StringValue } from '../types';
+import type { ExecutionContext, NodeDescriptor, StringValue } from '../types';
 
 export class BitmapNode extends AbstractBuiltinNode {
     static get descriptor(): NodeDescriptor {

@@ -1,3 +1,3 @@
-import { AbstractBuiltinNode } from '../node';
+import { AbstractBuiltinNode } from '../builtin-node';
 
 export class InputNode extends AbstractBuiltinNode {}

@@ -16,7 +16,7 @@ export function createEngine(config: EngineConfig): Engine {
     const engine: Engine = {
         backend,
         createGraph(config) {
-            return Graph.create(config, { engine });
+            return Graph.create(config);
         },
         getShaderDescriptor(id) {
             return shaderMap.get(id);

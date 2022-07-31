@@ -1,7 +1,8 @@
-import { Node } from './node';
 import { Graph, GraphContext } from './graph';
 
 import { uuid } from './utils/uuid';
+
+import type { Node } from './types';
 
 export interface EdgeInterface {
     id: string;

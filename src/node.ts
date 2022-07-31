@@ -1,8 +1,9 @@
 import { Graph, GraphContext } from './graph';
 import { createValue } from './value';
+
 import { uuid } from './utils/uuid';
 
-import type { Backend, Engine, NodeDescriptor, Texture, Value } from './types';
+import type { ExecutionContext, Node, NodeDescriptor, Texture, Value } from './types';
 
 export interface NodeConfig {
     id?: string;
@@ -16,16 +17,7 @@ export interface BaseSerializedNode {
     properties: Record<string, Value>;
 }
 
-export type Node = ShaderNode | AbstractBuiltinNode;
-export type SerializedNode = ShaderSerializedNode | BuiltinSerializedNode;
-
-export interface ExecutionContext {
-    engine: Engine;
-    graph: Graph;
-    backend: Backend;
-}
-
-export abstract class AbstractBaseNode {
+export abstract class AbstractBaseNode implements Node {
     id: string;
     descriptor: NodeDescriptor;
     properties: Record<string, Value>;
@@ -71,19 +63,20 @@ export abstract class AbstractBaseNode {
         }
     }
 
-    getInputs(): Record<string, Texture | null> {
-        const incomingEdges = this.#graph.getIncomingEdges(this);
+    getInput(name: string): Texture | null {
+        if (!Object.hasOwn(this.descriptor.inputs, name)) {
+            return null;
+        }
 
+        const incomingEdges = this.#graph.getIncomingEdges(this);
+        const inputEdge = incomingEdges.find((edge) => edge.toPort === name);
+        return inputEdge?.fromNode().getOutput(inputEdge.fromPort) ?? null;
+    }
+
+    getInputs(): Record<string, Texture | null> {
         return Object.fromEntries(
             Object.keys(this.descriptor.inputs).map((name) => {
-                let texture: Texture | null = null;
-
-                const inputEdge = incomingEdges.find((edge) => edge.toPort === name);
-                if (inputEdge) {
-                    texture = inputEdge.fromNode().outputs[inputEdge.fromPort];
-                }
-
-                return [name, texture];
+                return [name, this.getInput(name)];
             }),
         );
     }
@@ -103,109 +96,7 @@ export abstract class AbstractBaseNode {
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    execute(_ctx: ExecutionContext): void | Promise<void> {
+    async execute(_ctx: ExecutionContext) {
         throw new Error('Not implemented');
-    }
-}
-
-export interface ShaderNodeConfig extends NodeConfig {
-    shader: string;
-}
-
-export interface ShaderSerializedNode extends BaseSerializedNode {
-    type: 'shader';
-    shader: string;
-}
-
-export class ShaderNode extends AbstractBaseNode {
-    type = 'shader' as const;
-    shader: string;
-
-    constructor(config: ShaderNodeConfig, ctx: GraphContext) {
-        super(config, ctx);
-        this.shader = config.shader;
-    }
-
-    toJSON(): ShaderSerializedNode {
-        return {
-            ...this.toJSON(),
-            type: this.type,
-            shader: this.shader,
-        };
-    }
-
-    static create(config: Omit<ShaderNodeConfig, 'descriptor'>, ctx: GraphContext): ShaderNode {
-        const descriptor = ctx.engine.getShaderDescriptor(config.shader);
-        if (!descriptor) {
-            throw new Error(`Shader ${config.shader} not found`);
-        }
-
-        return new ShaderNode(
-            {
-                ...config,
-                descriptor,
-            },
-            ctx,
-        );
-    }
-
-    async execute(ctx: ExecutionContext): Promise<void> {
-        const properties = this.getProperties();
-        const inputs = this.getInputs();
-        const outputs = this.getOutputs();
-
-        const compiledShader = await ctx.engine.getCompiledShader(this.shader);
-        compiledShader.render(properties, inputs, outputs);
-    }
-}
-
-export enum BuiltInNodeType {
-    Input = 'input',
-    Output = 'output',
-    Bitmap = 'bitmap',
-    SVG = 'svg',
-}
-
-export interface BuiltinNodeConfig extends NodeConfig {
-    nodeType: BuiltInNodeType;
-}
-
-export interface BuiltinSerializedNode extends BaseSerializedNode {
-    type: 'builtin';
-    nodeType: BuiltInNodeType;
-}
-
-export abstract class AbstractBuiltinNode extends AbstractBaseNode {
-    type = 'builtin' as const;
-    nodeType: BuiltInNodeType;
-
-    constructor(config: BuiltinNodeConfig, ctx: GraphContext) {
-        super(config, ctx);
-        this.nodeType = config.nodeType;
-    }
-
-    toJSON(): BuiltinSerializedNode {
-        return {
-            ...this.toJSON(),
-            type: this.type,
-            nodeType: this.nodeType,
-        };
-    }
-
-    static get descriptor(): NodeDescriptor {
-        throw new Error('Not implemented');
-    }
-
-    static create(
-        config: Omit<BuiltinNodeConfig, 'descriptor'>,
-        ctx: GraphContext,
-    ): AbstractBuiltinNode {
-        const descriptor = this.descriptor;
-
-        // TODO: Find a better way to instantiate built-in classes.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: Unreachable code error
-        return new this({ ...config, descriptor }, ctx);
     }
 }

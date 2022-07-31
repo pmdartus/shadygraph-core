@@ -33,15 +33,11 @@ function renderPreviews(graph: Graph) {
 
     for (const node of graph.iterNodes()) {
         const container = document.createElement('div');
-        if (node.type === 'shader') {
-            container.textContent = `${node.id} (shader: ${node.shader})`;
-        } else if (node.type === 'builtin') {
-            container.textContent = `${node.id} (type: ${node.nodeType})`;
-        }
+        container.textContent = node.toString();
 
         root.appendChild(container);
 
-        for (const [outputId, outputTexture] of Object.entries(node.outputs)) {
+        for (const [outputId, outputTexture] of Object.entries(node.getOutputs())) {
             const outputContainer = document.createElement('div');
             outputContainer.textContent = `${outputId}`;
             container.appendChild(outputContainer);
