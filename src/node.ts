@@ -2,7 +2,7 @@ import { Graph, GraphContext } from './graph';
 import { createValue } from './value';
 import { uuid } from './utils/uuid';
 
-import type { NodeDescriptor, Texture, Value } from './types';
+import type { Backend, Engine, NodeDescriptor, Texture, Value } from './types';
 
 export interface NodeConfig {
     id?: string;
@@ -16,10 +16,16 @@ export interface BaseSerializedNode {
     properties: Record<string, Value>;
 }
 
-export type Node = ShaderNode | BuiltinNode;
+export type Node = ShaderNode | AbstractBuiltinNode;
 export type SerializedNode = ShaderSerializedNode | BuiltinSerializedNode;
 
-export abstract class AbstractNode {
+export interface ExecutionContext {
+    engine: Engine;
+    graph: Graph;
+    backend: Backend;
+}
+
+export abstract class AbstractBaseNode {
     id: string;
     descriptor: NodeDescriptor;
     properties: Record<string, Value>;
@@ -48,11 +54,21 @@ export abstract class AbstractNode {
 
     getProperties(): Record<string, Value> {
         return Object.fromEntries(
-            Object.entries(this.descriptor.properties).map(([name, property]) => {
-                const value = this.properties[name] ?? createValue(property.type, property.default);
-                return [name, value];
-            }),
+            Object.keys(this.descriptor.properties).map((name) => [name, this.getProperty(name)!]),
         );
+    }
+
+    getProperty<T extends Value>(name: string): T | null {
+        if (!Object.hasOwn(this.descriptor.properties, name)) {
+            return null;
+        }
+
+        if (Object.hasOwn(this.properties, name)) {
+            return this.properties[name] as T;
+        } else {
+            const propertyDescriptor = this.descriptor.properties[name];
+            return createValue<T>(propertyDescriptor.type, propertyDescriptor.default);
+        }
     }
 
     getInputs(): Record<string, Texture | null> {
@@ -73,7 +89,11 @@ export abstract class AbstractNode {
     }
 
     getOutputs(): Record<string, Texture> {
-        return this.outputs;
+        return { ...this.outputs };
+    }
+
+    getOutput(name: string): Texture | null {
+        return Object.hasOwn(this.outputs, name) ? this.outputs[name] : null;
     }
 
     toJSON(): BaseSerializedNode {
@@ -83,14 +103,9 @@ export abstract class AbstractNode {
         };
     }
 
-    static fromJSON(json: SerializedNode, ctx: GraphContext): Node {
-        switch (json.type) {
-            case 'shader':
-                return ShaderNode.create(json, ctx);
-
-            case 'builtin':
-                return BuiltinNode.create(json, ctx);
-        }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    execute(_ctx: ExecutionContext): void | Promise<void> {
+        throw new Error('Not implemented');
     }
 }
 
@@ -103,7 +118,7 @@ export interface ShaderSerializedNode extends BaseSerializedNode {
     shader: string;
 }
 
-class ShaderNode extends AbstractNode {
+export class ShaderNode extends AbstractBaseNode {
     type = 'shader' as const;
     shader: string;
 
@@ -134,6 +149,15 @@ class ShaderNode extends AbstractNode {
             ctx,
         );
     }
+
+    async execute(ctx: ExecutionContext): Promise<void> {
+        const properties = this.getProperties();
+        const inputs = this.getInputs();
+        const outputs = this.getOutputs();
+
+        const compiledShader = await ctx.engine.getCompiledShader(this.shader);
+        compiledShader.render(properties, inputs, outputs);
+    }
 }
 
 export enum BuiltInNodeType {
@@ -142,63 +166,6 @@ export enum BuiltInNodeType {
     Bitmap = 'bitmap',
     SVG = 'svg',
 }
-
-const BUILTIN_NODE_DESCRIPTORS: { [name in BuiltInNodeType]: NodeDescriptor } = {
-    [BuiltInNodeType.Input]: {
-        properties: {},
-        inputs: {},
-        outputs: {
-            output: {
-                label: 'Output',
-                type: 'color',
-            },
-        },
-    },
-    [BuiltInNodeType.Output]: {
-        properties: {},
-        inputs: {
-            input: {
-                label: 'Input',
-                type: 'color',
-            },
-        },
-        outputs: {},
-    },
-    [BuiltInNodeType.Bitmap]: {
-        properties: {
-            source: {
-                label: 'Source',
-                description: 'Image source URL or file path',
-                type: 'string',
-                default: '',
-            },
-        },
-        inputs: {},
-        outputs: {
-            output: {
-                label: 'Output',
-                type: 'color',
-            },
-        },
-    },
-    [BuiltInNodeType.SVG]: {
-        properties: {
-            source: {
-                label: 'Source',
-                description: 'Image source URL or file path',
-                type: 'string',
-                default: '',
-            },
-        },
-        inputs: {},
-        outputs: {
-            output: {
-                label: 'Output',
-                type: 'color',
-            },
-        },
-    },
-};
 
 export interface BuiltinNodeConfig extends NodeConfig {
     nodeType: BuiltInNodeType;
@@ -209,7 +176,7 @@ export interface BuiltinSerializedNode extends BaseSerializedNode {
     nodeType: BuiltInNodeType;
 }
 
-class BuiltinNode extends AbstractNode {
+export abstract class AbstractBuiltinNode extends AbstractBaseNode {
     type = 'builtin' as const;
     nodeType: BuiltInNodeType;
 
@@ -226,18 +193,19 @@ class BuiltinNode extends AbstractNode {
         };
     }
 
-    static create(config: Omit<BuiltinNodeConfig, 'descriptor'>, ctx: GraphContext): BuiltinNode {
-        const descriptor = BUILTIN_NODE_DESCRIPTORS[config.nodeType];
-        if (!descriptor) {
-            throw new Error(`Builtin node type ${config.nodeType} not found`);
-        }
+    static get descriptor(): NodeDescriptor {
+        throw new Error('Not implemented');
+    }
 
-        return new BuiltinNode(
-            {
-                ...config,
-                descriptor,
-            },
-            ctx,
-        );
+    static create(
+        config: Omit<BuiltinNodeConfig, 'descriptor'>,
+        ctx: GraphContext,
+    ): AbstractBuiltinNode {
+        const descriptor = this.descriptor;
+
+        // TODO: Find a better way to instantiate built-in classes.
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore: Unreachable code error
+        return new this({ ...config, descriptor }, ctx);
     }
 }

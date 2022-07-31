@@ -118,6 +118,7 @@ export interface EngineConfig {
 export interface Engine {
     backend: Backend;
     getShaderDescriptor(id: string): ShaderDescriptor | undefined;
+    getCompiledShader(id: string): Promise<CompilerShader>;
     createGraph(config: GraphConfig): Graph;
     loadGraph(serializedGraph: SerializedGraph): Graph;
     renderGraph(graph: Graph): Promise<void>;

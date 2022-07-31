@@ -1,18 +1,40 @@
-import { Backend, Texture } from '../types';
+import { AbstractBuiltinNode, ExecutionContext } from '../node';
 
-export async function loadBitmapToTexture(
-    backend: Backend,
-    url: string,
-    texture: Texture,
-): Promise<void> {
-    const response = await fetch(url);
+import type { NodeDescriptor, StringValue } from '../types';
 
-    if (!response.ok) {
-        throw new Error(`Failed to image fetch at "${url}".`);
+export class BitmapNode extends AbstractBuiltinNode {
+    static get descriptor(): NodeDescriptor {
+        return {
+            properties: {
+                source: {
+                    label: 'Source',
+                    type: 'string',
+                    description: 'The image source URL.',
+                    default: '',
+                },
+            },
+            inputs: {},
+            outputs: {
+                output: {
+                    label: 'Output',
+                    type: 'color',
+                },
+            },
+        };
     }
 
-    const blob = await response.blob();
-    const bitmap = await createImageBitmap(blob);
+    async execute(ctx: ExecutionContext): Promise<void> {
+        const sourceValue = this.getProperty<StringValue>('source')!;
 
-    backend.copyImageToTexture(bitmap, texture);
+        const response = await fetch(sourceValue.value);
+        if (!response.ok) {
+            throw new Error(`Failed to image fetch at "${sourceValue.value}".`);
+        }
+
+        const blob = await response.blob();
+        const bitmap = await createImageBitmap(blob);
+
+        const texture = this.getOutput('output')!;
+        ctx.backend.copyImageToTexture(bitmap, texture);
+    }
 }

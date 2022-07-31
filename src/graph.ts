@@ -1,7 +1,12 @@
 import { Edge, isValidEdge, SerializedEdge } from './edge';
-import { AbstractNode, Node, SerializedNode } from './node';
+import { AbstractBaseNode, BuiltInNodeType, Node, SerializedNode, ShaderNode } from './node';
 
 import { uuid } from './utils/uuid';
+
+import { InputNode } from './builtins/input';
+import { OutputNode } from './builtins/output';
+import { BitmapNode } from './builtins/bitmap';
+import { SvgNode } from './builtins/svg';
 
 import type { Engine } from './types';
 
@@ -47,11 +52,11 @@ export class Graph {
         return this._edgeMap.get(id);
     }
 
-    getOutgoingEdges(node: AbstractNode): Edge[] {
+    getOutgoingEdges(node: AbstractBaseNode): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.from === node.id);
     }
 
-    getIncomingEdges(node: AbstractNode): Edge[] {
+    getIncomingEdges(node: AbstractBaseNode): Edge[] {
         return Array.from(this._edgeMap.values()).filter((edge) => edge.to === node.id);
     }
 
@@ -99,7 +104,7 @@ export class Graph {
         const { id, size, label, _nodeMap, _edgeMap } = this;
 
         const nodes = Object.fromEntries(
-            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON() as SerializedNode]),
+            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON()]),
         );
         const edges = Object.fromEntries(
             Array.from(_edgeMap.values()).map((edge) => [edge.id, edge.toJSON()]),
@@ -123,7 +128,30 @@ export class Graph {
         const graphCtx = { ...ctx, graph };
 
         for (const [id, serializedNode] of Object.entries(json.nodes)) {
-            const node = AbstractNode.fromJSON(serializedNode, graphCtx);
+            let node: Node;
+
+            if (serializedNode.type === 'shader') {
+                node = ShaderNode.create(serializedNode, graphCtx);
+            } else {
+                switch (serializedNode.nodeType) {
+                    case BuiltInNodeType.Input:
+                        node = InputNode.create(serializedNode, graphCtx);
+                        break;
+
+                    case BuiltInNodeType.Output:
+                        node = OutputNode.create(serializedNode, graphCtx);
+                        break;
+
+                    case BuiltInNodeType.Bitmap:
+                        node = BitmapNode.create(serializedNode, graphCtx);
+                        break;
+
+                    case BuiltInNodeType.SVG:
+                        node = SvgNode.create(serializedNode, graphCtx);
+                        break;
+                }
+            }
+
             graph._nodeMap.set(id, node);
         }
 

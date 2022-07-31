@@ -16,6 +16,7 @@
     "author": "Pierre-Marie Dartus <pm@dartus.fr>",
     "license": "MIT",
     "devDependencies": {
+        "@types/offscreencanvas": "^2019.7.0",
         "@typescript-eslint/eslint-plugin": "^5.30.5",
         "@typescript-eslint/parser": "^5.30.5",
         "@webgpu/types": "^0.1.20",
