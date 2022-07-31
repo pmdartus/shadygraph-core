@@ -1,0 +1,34 @@
+{
+    "id": "svg",
+    "label": "SVG",
+    "size": 512,
+    "nodes": {
+        "Rocket": {
+            "id": "Rocket",
+            "type": "builtin",
+            "nodeType": "svg",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/emoji.svg"
+                }
+            }
+        },
+        "Rocket_Red": {
+            "id": "Rocket_Red",
+            "type": "builtin",
+            "nodeType": "svg",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/emoji.svg"
+                },
+                "background": {
+                    "type": "float4",
+                    "value": [1, 0, 0, 1]
+                }
+            }
+        }
+    },
+    "edges": {}
+}

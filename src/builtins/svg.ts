@@ -1,6 +1,21 @@
 import { AbstractBuiltinNode, ExecutionContext } from '../node';
 
-import type { Int4Value, NodeDescriptor, StringValue } from '../types';
+import type { Float4Value, NodeDescriptor, StringValue } from '../types';
+
+function loadImage(src: string): Promise<HTMLImageElement> {
+    const img = new Image();
+    img.src = src;
+
+    return new Promise((resolve, reject) => {
+        img.onload = () => resolve(img);
+        img.onerror = (err) => reject(err);
+    });
+}
+
+function bgColorToRgba(color: Float4Value): string {
+    const [r, g, b, a] = color.value;
+    return `rgba(${r * 255}, ${g * 255}, ${b * 255}, ${a})`;
+}
 
 export class SvgNode extends AbstractBuiltinNode {
     static get descriptor(): NodeDescriptor {
@@ -31,26 +46,19 @@ export class SvgNode extends AbstractBuiltinNode {
 
     async execute(ctx: ExecutionContext): Promise<void> {
         const sourceValue = this.getProperty<StringValue>('source')!;
-        const bgColorValue = this.getProperty<Int4Value>('background')!;
+        const bgColorValue = this.getProperty<Float4Value>('background')!;
 
         const texture = this.getOutput('output')!;
 
-        const response = await fetch(sourceValue.value);
-        if (!response.ok) {
-            throw new Error(`Failed to image fetch at "${sourceValue.value}".`);
-        }
-
-        const blob = await response.blob();
-        const svgBitmap = await createImageBitmap(blob);
+        const img = await loadImage(sourceValue.value);
 
         const { size } = ctx.graph;
-
         const canvas = new OffscreenCanvas(size, size);
         const canvasCtx = canvas.getContext('2d')!;
 
-        canvasCtx.fillStyle = `rgba(${bgColorValue.value.join(',')})`;
+        canvasCtx.fillStyle = bgColorToRgba(bgColorValue);
         canvasCtx.fillRect(0, 0, size, size);
-        canvasCtx.drawImage(svgBitmap, 0, 0, size, size);
+        canvasCtx.drawImage(img, 0, 0, size, size);
 
         const outputImageData = canvasCtx.getImageData(0, 0, size, size);
         const outputBitmap = await createImageBitmap(outputImageData);
