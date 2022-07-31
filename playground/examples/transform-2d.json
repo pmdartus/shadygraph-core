@@ -1,0 +1,150 @@
+{
+    "id": "transform-2d",
+    "label": "Transform 2D",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "Translation": {
+            "id": "Translation",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "translation": {
+                    "type": "float2",
+                    "value": [0.5, 0.5]
+                }
+            }
+        },
+        "Rotation": {
+            "id": "Rotation",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "rotation": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        },
+        "Rot_Trans": {
+            "id": "Rot_Trans",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "rotation": {
+                    "type": "float1",
+                    "value": [0.6]
+                },
+                "translation": {
+                    "type": "float2",
+                    "value": [-0.7, 0.1]
+                }
+            }
+        },
+        "Scale_L": {
+            "id": "Scale_L",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "scale": {
+                    "type": "float2",
+                    "value": [0.5, 0.5]
+                }
+            }
+        },
+        "Scale_S": {
+            "id": "Scale_S",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "scale": {
+                    "type": "float2",
+                    "value": [2, 2]
+                }
+            }
+        },
+        "Scale_SX": {
+            "id": "Scale_SX",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "scale": {
+                    "type": "float2",
+                    "value": [2, 1]
+                }
+            }
+        },
+        "Shear_X": {
+            "id": "Shear_X",
+            "type": "shader",
+            "shader": "#transform-2d",
+            "properties": {
+                "shear": {
+                    "type": "float2",
+                    "value": [0, 1]
+                }
+            }
+        }
+    },
+    "edges": {
+        "MonaLisa_Translation": {
+            "id": "MonaLisa_Translation",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Translation",
+            "toPort": "input"
+        },
+        "MonaLisa_Rotation": {
+            "id": "MonaLisa_Rotation",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Rotation",
+            "toPort": "input"
+        },
+        "MonaLisa_Rot_Trans": {
+            "id": "MonaLisa_Rot_Trans",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Rot_Trans",
+            "toPort": "input"
+        },
+        "MonaLisa_Scale_L": {
+            "id": "MonaLisa_Scale_L",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Scale_L",
+            "toPort": "input"
+        },
+        "MonaLisa_Scale_S": {
+            "id": "MonaLisa_Scale_S",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Scale_S",
+            "toPort": "input"
+        },
+        "MonaLisa_Scale_SX": {
+            "id": "MonaLisa_Scale_SX",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Scale_SX",
+            "toPort": "input"
+        },
+        "MonaLisa_Shear_X": {
+            "id": "MonaLisa_Shear_X",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Shear_X",
+            "toPort": "input"
+        }
+    }
+}

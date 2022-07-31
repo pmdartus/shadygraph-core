@@ -9,6 +9,7 @@ import GRAYSCALE_TO_COLOR from './grayscale-to-color';
 import INVERT from './invert';
 import MIRROR from './mirror';
 import SQUARE from './square';
+import TRANSFORM_2D from './transform-2d';
 import UNIFORM_COLOR from './uniform-color';
 import WHITE_NOISE from './whitenoise';
 
@@ -24,6 +25,7 @@ export const shaders = [
     INVERT,
     MIRROR,
     SQUARE,
+    TRANSFORM_2D,
     UNIFORM_COLOR,
     WHITE_NOISE,
 ];
