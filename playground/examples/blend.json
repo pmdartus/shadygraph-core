@@ -25,6 +25,17 @@
                 }
             }
         },
+        "Mask": {
+            "id": "Mask",
+            "type": "shader",
+            "shader": "#disc",
+            "properties": {
+                "size": {
+                    "type": "float1",
+                    "value": [0.8]
+                }
+            }
+        },
         "Default": {
             "id": "Default",
             "type": "shader",
@@ -157,6 +168,17 @@
                 "mode": {
                     "type": "int1",
                     "value": [9]
+                }
+            }
+        },
+        "Masked": {
+            "id": "Masked",
+            "type": "shader",
+            "shader": "#blend",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [3]
                 }
             }
         }
@@ -329,6 +351,27 @@
             "fromPort": "output",
             "to": "Screen",
             "toPort": "foreground"
+        },
+        "MonaLisa-Masked": {
+            "id": "MonaLisa-Masked",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Masked",
+            "toPort": "background"
+        },
+        "PearlEarring-Masked": {
+            "id": "PearlEarring-Masked",
+            "from": "PearlEarring",
+            "fromPort": "output",
+            "to": "Masked",
+            "toPort": "foreground"
+        },
+        "Mask-Masked": {
+            "id": "Mask-Masked",
+            "from": "Mask",
+            "fromPort": "output",
+            "to": "Masked",
+            "toPort": "mask"
         }
     }
 }

@@ -72,8 +72,17 @@ const SOURCE = wgsl`
             }
         }
 
+        
+        var opacity = config.opacity;
+        var mask = textureSample(mask_texture, mask_sampler, coordinate);
+
+        // Calculate actual opacity. If the mask isn't connected it's alpha value will be 0.
+        if (bool(mask.a)) {
+            opacity *= mask.r;
+        }
+        
         // Finally apply by mixing the output with the background.
-        output = mix(background, output, config.opacity);
+        output = mix(background, output, opacity);
 
         return Output(vec4<f32>(output, 1.0));
     }
@@ -106,11 +115,10 @@ export default createShaderDescriptor({
             label: 'Background',
             type: 'color',
         },
-        // TODO: Add opacity map input.
-        // opacity: {
-        //     label: 'Opacity',
-        //     type: 'grayscale',
-        // },
+        mask: {
+            label: 'Mask',
+            type: 'grayscale',
+        },
     },
     outputs: {
         output: {

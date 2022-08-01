@@ -52,6 +52,14 @@ export async function createCompiledShader(
         ],
     });
 
+    // FIXME: The texture fallback should be shared by all the shaders.
+    const textureFallback = device.createTexture({
+        format: 'rgba8unorm',
+        size: { width: 1, height: 1 },
+        usage: GPUTextureUsage.TEXTURE_BINDING,
+    });
+    const textureFallbackView = textureFallback.createView();
+
     const pipelineInputs = Object.keys(shader.inputs).map((inputId) => {
         const sampler = device.createSampler({
             label: `Input:${id}:${inputId}`,
@@ -112,7 +120,7 @@ export async function createCompiledShader(
     return {
         render(
             properties: Record<string, Value>,
-            inputs: Record<string, WebGpuTexture>,
+            inputs: Record<string, WebGpuTexture | null>,
             outputs: Record<string, WebGpuTexture>,
         ): void {
             shaderConfig.writePropertiesBuffer(
@@ -136,7 +144,11 @@ export async function createCompiledShader(
                     renderPass.setPipeline(pipeline);
                     renderPass.setBindGroup(0, propertiesBindGroup);
                     for (let i = 0; i < pipelineInputs.length; i++) {
-                        // TODO: Handle cases where the input is not provided.
+                        const pipelineInput = pipelineInputs[i];
+
+                        const sampler = pipelineInput.sampler;
+                        const view = inputs[pipelineInput.id]?.view ?? textureFallbackView;
+
                         renderPass.setBindGroup(
                             i + 1,
                             device.createBindGroup({
@@ -144,11 +156,11 @@ export async function createCompiledShader(
                                 entries: [
                                     {
                                         binding: 0,
-                                        resource: inputs[pipelineInputs[i].id].view,
+                                        resource: view,
                                     },
                                     {
                                         binding: 1,
-                                        resource: pipelineInputs[i].sampler,
+                                        resource: sampler,
                                     },
                                 ],
                             }),
