@@ -128,17 +128,30 @@ export interface ExecutionContext {
     engine: Engine;
     graph: Graph;
     backend: Backend;
-}
-
-export interface Node {
-    id: string;
-    descriptor: NodeDescriptor;
-    getProperty<T extends Value>(name: string): T | null;
-    getProperties(): Record<string, Value>;
     getInput(name: string): Texture | null;
     getInputs(): Record<string, Texture | null>;
-    getOutput(name: string): Texture | null;
+    getOutput(name: string): Texture;
     getOutputs(): Record<string, Texture>;
+}
+
+interface Serializable<T = any> {
+    toJSON(): T;
+}
+
+export interface Node extends Serializable {
+    id: string;
+    descriptor: NodeDescriptor;
+    properties: Record<string, Value>;
+    outputs: Record<string, Texture>;
+    getProperty<T extends Value>(name: string): T | null;
+    getProperties(): Record<string, Value>;
     execute(ctx: ExecutionContext): void | Promise<void>;
-    toJSON(): any;
+}
+
+export interface Edge extends Serializable {
+    id: string;
+    from: string;
+    fromPort: string;
+    to: string;
+    toPort: string;
 }

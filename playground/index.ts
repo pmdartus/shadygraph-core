@@ -37,7 +37,7 @@ function renderPreviews(graph: Graph) {
 
         root.appendChild(container);
 
-        for (const [outputId, outputTexture] of Object.entries(node.getOutputs())) {
+        for (const [outputId, outputTexture] of Object.entries(node.outputs)) {
             const outputContainer = document.createElement('div');
             outputContainer.textContent = `${outputId}`;
             container.appendChild(outputContainer);

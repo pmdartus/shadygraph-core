@@ -1,4 +1,3 @@
-import { GraphContext } from './graph';
 import { AbstractBaseNode, BaseSerializedNode, NodeConfig } from './node';
 
 import type { NodeDescriptor } from './types';
@@ -23,8 +22,8 @@ export abstract class AbstractBuiltinNode extends AbstractBaseNode {
     type = 'builtin' as const;
     nodeType: BuiltInNodeType;
 
-    constructor(config: BuiltinNodeConfig, ctx: GraphContext) {
-        super(config, ctx);
+    constructor(config: BuiltinNodeConfig) {
+        super(config);
         this.nodeType = config.nodeType;
     }
 
@@ -44,15 +43,12 @@ export abstract class AbstractBuiltinNode extends AbstractBaseNode {
         throw new Error('Not implemented');
     }
 
-    static create(
-        config: Omit<BuiltinNodeConfig, 'descriptor'>,
-        ctx: GraphContext,
-    ): AbstractBuiltinNode {
+    static create(config: Omit<BuiltinNodeConfig, 'descriptor'>): AbstractBuiltinNode {
         const descriptor = this.descriptor;
 
         // TODO: Find a better way to instantiate built-in classes.
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: Unreachable code error
-        return new this({ ...config, descriptor }, ctx);
+        return new this({ ...config, descriptor });
     }
 }

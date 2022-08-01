@@ -1,4 +1,3 @@
-import { Graph, GraphContext } from './graph';
 import { createValue } from './value';
 
 import { uuid } from './utils/uuid';
@@ -22,26 +21,13 @@ export abstract class AbstractBaseNode implements Node {
     descriptor: NodeDescriptor;
     properties: Record<string, Value>;
     outputs: Record<string, Texture>;
-    #graph: Graph;
 
     /** @internal */
-    constructor(config: NodeConfig, ctx: GraphContext) {
+    constructor(config: NodeConfig) {
         this.id = config.id ?? uuid();
         this.descriptor = config.descriptor;
         this.properties = config.properties ?? {};
-
-        if (config.outputs) {
-            this.outputs = config.outputs;
-        } else {
-            this.outputs = Object.fromEntries(
-                Object.entries(this.descriptor.outputs).map(([name, output]) => [
-                    name,
-                    ctx.engine.backend.createTexture({ type: output.type, size: ctx.graph.size }),
-                ]),
-            );
-        }
-
-        this.#graph = ctx.graph;
+        this.outputs = config.outputs ?? {};
     }
 
     getProperties(): Record<string, Value> {
@@ -61,32 +47,6 @@ export abstract class AbstractBaseNode implements Node {
             const propertyDescriptor = this.descriptor.properties[name];
             return createValue<T>(propertyDescriptor.type, propertyDescriptor.default);
         }
-    }
-
-    getInput(name: string): Texture | null {
-        if (!Object.hasOwn(this.descriptor.inputs, name)) {
-            return null;
-        }
-
-        const incomingEdges = this.#graph.getIncomingEdges(this);
-        const inputEdge = incomingEdges.find((edge) => edge.toPort === name);
-        return inputEdge?.fromNode().getOutput(inputEdge.fromPort) ?? null;
-    }
-
-    getInputs(): Record<string, Texture | null> {
-        return Object.fromEntries(
-            Object.keys(this.descriptor.inputs).map((name) => {
-                return [name, this.getInput(name)];
-            }),
-        );
-    }
-
-    getOutputs(): Record<string, Texture> {
-        return { ...this.outputs };
-    }
-
-    getOutput(name: string): Texture | null {
-        return Object.hasOwn(this.outputs, name) ? this.outputs[name] : null;
     }
 
     toJSON(): BaseSerializedNode {

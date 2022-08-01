@@ -48,7 +48,7 @@ export class SvgNode extends AbstractBuiltinNode {
         const sourceValue = this.getProperty<StringValue>('source')!;
         const bgColorValue = this.getProperty<Float4Value>('background')!;
 
-        const texture = this.getOutput('output')!;
+        const texture = ctx.getOutput('output');
 
         const img = await loadImage(sourceValue.value);
 

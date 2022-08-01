@@ -34,7 +34,7 @@ export class BitmapNode extends AbstractBuiltinNode {
         const blob = await response.blob();
         const bitmap = await createImageBitmap(blob);
 
-        const texture = this.getOutput('output')!;
+        const texture = ctx.getOutput('output');
         ctx.backend.copyImageToTexture(bitmap, texture);
     }
 }

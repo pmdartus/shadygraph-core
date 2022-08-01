@@ -16,8 +16,8 @@ export class ShaderNode extends AbstractBaseNode implements Node {
     type = 'shader' as const;
     shader: string;
 
-    constructor(config: ShaderNodeConfig, ctx: GraphContext) {
-        super(config, ctx);
+    constructor(config: ShaderNodeConfig) {
+        super(config);
         this.shader = config.shader;
     }
 
@@ -39,19 +39,16 @@ export class ShaderNode extends AbstractBaseNode implements Node {
             throw new Error(`Shader ${config.shader} not found`);
         }
 
-        return new ShaderNode(
-            {
-                ...config,
-                descriptor,
-            },
-            ctx,
-        );
+        return new ShaderNode({
+            ...config,
+            descriptor,
+        });
     }
 
     async execute(ctx: ExecutionContext) {
         const properties = this.getProperties();
-        const inputs = this.getInputs();
-        const outputs = this.getOutputs();
+        const inputs = ctx.getInputs();
+        const outputs = ctx.getOutputs();
 
         const compiledShader = await ctx.engine.getCompiledShader(this.shader);
         compiledShader.render(properties, inputs, outputs);

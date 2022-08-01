@@ -1,4 +1,4 @@
-import { Edge, isValidEdge, SerializedEdge } from './edge';
+import { EdgeImpl, isValidEdge, SerializedEdge } from './edge';
 
 import { uuid } from './utils/uuid';
 
@@ -9,7 +9,7 @@ import { OutputNode } from './builtins/output';
 import { BitmapNode } from './builtins/bitmap';
 import { SvgNode } from './builtins/svg';
 
-import type { Engine, Node } from './types';
+import type { Engine, Node, Edge } from './types';
 
 export interface GraphConfig {
     size?: number;
@@ -33,8 +33,8 @@ export class Graph {
     id: string;
     size: number;
     label: string;
-    _nodeMap = new Map<string, Node>();
-    _edgeMap = new Map<string, Edge>();
+    #nodeMap = new Map<string, Node>();
+    #edgeMap = new Map<string, Edge>();
 
     /** @internal */
     constructor(config: { id: string; size: number; label: string }) {
@@ -44,19 +44,19 @@ export class Graph {
     }
 
     getNode(id: string): Node | undefined {
-        return this._nodeMap.get(id);
+        return this.#nodeMap.get(id);
     }
 
     getEdge(id: string): Edge | undefined {
-        return this._edgeMap.get(id);
+        return this.#edgeMap.get(id);
     }
 
     getOutgoingEdges(node: Node): Edge[] {
-        return Array.from(this._edgeMap.values()).filter((edge) => edge.from === node.id);
+        return Array.from(this.#edgeMap.values()).filter((edge) => edge.from === node.id);
     }
 
     getIncomingEdges(node: Node): Edge[] {
-        return Array.from(this._edgeMap.values()).filter((edge) => edge.to === node.id);
+        return Array.from(this.#edgeMap.values()).filter((edge) => edge.to === node.id);
     }
 
     clone(): Graph {
@@ -66,19 +66,19 @@ export class Graph {
             label: this.label,
         });
 
-        graph._nodeMap = new Map(this._nodeMap);
-        graph._edgeMap = new Map(this._edgeMap);
+        graph.#nodeMap = new Map(this.#nodeMap);
+        graph.#edgeMap = new Map(this.#edgeMap);
 
         return graph;
     }
 
     *iterNodes(): Iterable<Node> {
         const inDegrees = new Map<Node, number>(
-            Array.from(this._nodeMap.values()).map((node) => [node, 0]),
+            Array.from(this.#nodeMap.values()).map((node) => [node, 0]),
         );
 
-        for (const edge of this._edgeMap.values()) {
-            const toNode = edge.toNode();
+        for (const edge of this.#edgeMap.values()) {
+            const toNode = this.getNode(edge.to)!;
             inDegrees.set(toNode, inDegrees.get(toNode)! + 1);
         }
 
@@ -90,7 +90,7 @@ export class Graph {
                     yield node;
 
                     for (const edge of this.getOutgoingEdges(node)) {
-                        const toNode = edge.toNode();
+                        const toNode = this.getNode(edge.to)!;
                         inDegrees.set(toNode, inDegrees.get(toNode)! - 1);
                     }
                 }
@@ -99,13 +99,13 @@ export class Graph {
     }
 
     toJSON(): SerializedGraph {
-        const { id, size, label, _nodeMap, _edgeMap } = this;
+        const { id, size, label } = this;
 
         const nodes = Object.fromEntries(
-            Array.from(_nodeMap.values()).map((node) => [node.id, node.toJSON()]),
+            Array.from(this.#nodeMap.values()).map((node) => [node.id, node.toJSON()]),
         );
         const edges = Object.fromEntries(
-            Array.from(_edgeMap.values()).map((edge) => [edge.id, edge.toJSON()]),
+            Array.from(this.#edgeMap.values()).map((edge) => [edge.id, edge.toJSON()]),
         );
 
         return {
@@ -130,35 +130,35 @@ export class Graph {
             } else {
                 switch (serializedNode.nodeType) {
                     case BuiltInNodeType.Input:
-                        node = InputNode.create(serializedNode, graphCtx);
+                        node = InputNode.create(serializedNode);
                         break;
 
                     case BuiltInNodeType.Output:
-                        node = OutputNode.create(serializedNode, graphCtx);
+                        node = OutputNode.create(serializedNode);
                         break;
 
                     case BuiltInNodeType.Bitmap:
-                        node = BitmapNode.create(serializedNode, graphCtx);
+                        node = BitmapNode.create(serializedNode);
                         break;
 
                     case BuiltInNodeType.SVG:
-                        node = SvgNode.create(serializedNode, graphCtx);
+                        node = SvgNode.create(serializedNode);
                         break;
                 }
             }
 
-            graph._nodeMap.set(id, node!);
+            graph.#nodeMap.set(id, node!);
         }
 
         for (const [id, serializedEdge] of Object.entries(json.edges)) {
-            const edge = Edge.fromJSON(serializedEdge, graphCtx);
+            const edge = EdgeImpl.fromJSON(serializedEdge);
 
             const validationResult = isValidEdge(edge, graph);
             if (!validationResult.isValid) {
                 throw new Error(`Invalid edge: ${validationResult.reason}`);
             }
 
-            graph._edgeMap.set(id, edge);
+            graph.#edgeMap.set(id, edge);
         }
 
         return graph;
