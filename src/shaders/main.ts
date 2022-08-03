@@ -8,6 +8,8 @@ import GRADIENT_RADIAL from './gradient-radial';
 import GRAYSCALE_TO_COLOR from './grayscale-to-color';
 import INVERT from './invert';
 import MIRROR from './mirror';
+import RGBA_SPLIT from './rgba-split';
+import RGBA_MERGE from './rgba-merge';
 import SQUARE from './square';
 import TRANSFORM_2D from './transform-2d';
 import UNIFORM_COLOR from './uniform-color';
@@ -23,6 +25,8 @@ export const shaders = [
     GRADIENT_RADIAL,
     GRAYSCALE_TO_COLOR,
     INVERT,
+    RGBA_SPLIT,
+    RGBA_MERGE,
     MIRROR,
     SQUARE,
     TRANSFORM_2D,

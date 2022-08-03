@@ -1,0 +1,67 @@
+{
+    "id": "rgba-split-merge",
+    "label": "RGBA split/merge",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "Split": {
+            "id": "Split",
+            "type": "shader",
+            "shader": "#rgba-split",
+            "properties": {}
+        },
+        "Merge": {
+            "id": "Merge",
+            "type": "shader",
+            "shader": "#rgba-merge",
+            "properties": {}
+        }
+    },
+    "edges": {
+        "MonaLisa_Split": {
+            "id": "MonaLisa_Split",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Split",
+            "toPort": "input"
+        },
+        "Split-Red_Merge": {
+            "id": "Split-Red_Merge",
+            "from": "Split",
+            "fromPort": "red",
+            "to": "Merge",
+            "toPort": "red"
+        },
+        "Split-blue_Merge": {
+            "id": "Split-blue_Merge",
+            "from": "Split",
+            "fromPort": "blue",
+            "to": "Merge",
+            "toPort": "blue"
+        },
+        "Split-green_Merge": {
+            "id": "Split-green_Merge",
+            "from": "Split",
+            "fromPort": "green",
+            "to": "Merge",
+            "toPort": "green"
+        },
+        "Split-alpha_Merge": {
+            "id": "Split-alpha_Merge",
+            "from": "Split",
+            "fromPort": "alpha",
+            "to": "Merge",
+            "toPort": "alpha"
+        }
+    }
+}

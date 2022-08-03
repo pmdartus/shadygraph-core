@@ -26,6 +26,8 @@ export async function createCompiledShader(
         code: getShaderSource(shader, shaderConfig),
     });
 
+    console.log(getShaderSource(shader, shaderConfig));
+
     const propertiesBindGroupLayout = device.createBindGroupLayout({
         label: `Properties:${id}`,
         entries: [
@@ -60,42 +62,41 @@ export async function createCompiledShader(
     });
     const textureFallbackView = textureFallback.createView();
 
-    const pipelineInputs = Object.keys(shader.inputs).map((inputId) => {
-        const sampler = device.createSampler({
-            label: `Input:${id}:${inputId}`,
-            minFilter: 'linear',
-            magFilter: 'linear',
-        });
+    // FIXME: Isn't single sample necessary for the entire shader?
+    const inputSamplers = Object.fromEntries(
+        Object.keys(shader.inputs).map((inputId) => {
+            return [
+                inputId,
+                device.createSampler({
+                    label: `Input:${id}:${inputId}`,
+                    minFilter: 'linear',
+                    magFilter: 'linear',
+                }),
+            ];
+        }),
+    );
 
-        const layout = device.createBindGroupLayout({
-            label: `Input:${id}:${inputId}`,
-            entries: [
+    const inputsBindGroupLayout = device.createBindGroupLayout({
+        label: `Inputs:${id}`,
+        entries: Object.values(shader.inputs).flatMap((_input, index) => {
+            return [
                 {
-                    binding: 0,
+                    binding: index * 2,
                     visibility: GPUShaderStage.FRAGMENT,
                     texture: {},
                 },
                 {
-                    binding: 1,
+                    binding: index * 2 + 1,
                     visibility: GPUShaderStage.FRAGMENT,
                     sampler: {},
                 },
-            ],
-        });
-
-        return {
-            id: inputId,
-            sampler,
-            layout,
-        };
+            ];
+        }),
     });
 
     const pipelineLayout = device.createPipelineLayout({
         label: id,
-        bindGroupLayouts: [
-            propertiesBindGroupLayout,
-            ...pipelineInputs.map((input) => input.layout),
-        ],
+        bindGroupLayouts: [propertiesBindGroupLayout, inputsBindGroupLayout],
     });
 
     const pipeline = await device.createRenderPipelineAsync({
@@ -143,29 +144,28 @@ export async function createCompiledShader(
                 {
                     renderPass.setPipeline(pipeline);
                     renderPass.setBindGroup(0, propertiesBindGroup);
-                    for (let i = 0; i < pipelineInputs.length; i++) {
-                        const pipelineInput = pipelineInputs[i];
+                    renderPass.setBindGroup(
+                        1,
+                        device.createBindGroup({
+                            label: `Inputs:${id}`,
+                            layout: inputsBindGroupLayout,
+                            entries: Object.keys(shader.inputs).flatMap((inputId, index) => {
+                                const view = inputs[inputId]?.view ?? textureFallbackView;
+                                const sampler = inputSamplers[inputId];
 
-                        const sampler = pipelineInput.sampler;
-                        const view = inputs[pipelineInput.id]?.view ?? textureFallbackView;
-
-                        renderPass.setBindGroup(
-                            i + 1,
-                            device.createBindGroup({
-                                layout: pipelineInputs[i].layout,
-                                entries: [
+                                return [
                                     {
-                                        binding: 0,
+                                        binding: index * 2,
                                         resource: view,
                                     },
                                     {
-                                        binding: 1,
+                                        binding: index * 2 + 1,
                                         resource: sampler,
                                     },
-                                ],
+                                ];
                             }),
-                        );
-                    }
+                        }),
+                    );
 
                     renderPass.draw(6, 1, 0, 0);
                     renderPass.end();
@@ -184,15 +184,6 @@ export async function createCompiledShader(
 
 function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string {
     const configStruct = config.toWgsl();
-    const structBinding = wgsl`@group(0) @binding(0) var<uniform> config: Config;`;
-
-    const inputsBindings = Object.keys(shader.inputs).map(
-        (key, index) => wgsl`
-        @group(${index + 1}) @binding(0) var ${key}_texture: texture_2d<f32>;
-        @group(${index + 1}) @binding(1) var ${key}_sampler: sampler;
-    `,
-    );
-
     const outputStruct = wgsl`
         struct Output {
             ${Object.entries(shader.outputs).map(
@@ -201,6 +192,14 @@ function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string
             )}
         }
     `;
+
+    const structBinding = wgsl`@group(0) @binding(0) var<uniform> config: Config;`;
+    const inputsBindings = Object.keys(shader.inputs).map(
+        (key, index) => wgsl`
+        @group(1) @binding(${2 * index}) var ${key}_texture: texture_2d<f32>;
+        @group(1) @binding(${2 * index + 1}) var ${key}_sampler: sampler;
+    `,
+    );
 
     return wgsl`
         ${configStruct}
