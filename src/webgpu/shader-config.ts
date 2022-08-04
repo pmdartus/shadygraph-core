@@ -8,8 +8,13 @@ enum ConfigMemberKind {
 }
 
 interface ConfigMemberDescriptor {
+    /** The property kind. */
     kind: ConfigMemberKind;
+    /** The original property name. */
+    name: string;
+    /** The property value type. */
     type: ValueType;
+    /** The property offset in bytes. */
     offset: number;
 }
 
@@ -22,6 +27,7 @@ interface ConfigStructDescriptor {
 
 const KNOWN_ATTRIBUTES: Record<string, ValueType> = {
     seed: 'float1',
+    size: 'int1',
 };
 
 export class ShaderConfig {
@@ -61,22 +67,23 @@ export class ShaderConfig {
         attributes: Record<string, Value>,
         properties: Record<string, Value>,
     ): void {
-        for (const [key, member] of Object.entries(this.#desc.members)) {
+        for (const member of Object.values(this.#desc.members)) {
             let value: Value;
+            switch (member.kind) {
+                case ConfigMemberKind.Attribute:
+                    value = attributes[member.name];
+                    break;
 
-            if (member.kind === ConfigMemberKind.Attribute) {
-                value = attributes[key];
-                if (!value) {
-                    throw new Error(`Attribute ${key} is missing`);
-                }
-            } else if (member.kind === ConfigMemberKind.Property) {
-                value = properties[key];
-                if (!value) {
-                    throw new Error(`Property ${key} is missing`);
-                }
+                case ConfigMemberKind.Property:
+                    value = properties[member.name];
+                    break;
             }
 
-            setPropertyValue(this.#arrayBuffer, value!, member.offset);
+            if (!value) {
+                throw new Error(`Missing property ${member.name}`);
+            }
+
+            setPropertyValue(this.#arrayBuffer, value, member.offset);
         }
 
         this.#device.queue.writeBuffer(this.#buffer, 0, this.#arrayBuffer);
@@ -97,34 +104,35 @@ function createConfigDescriptor(shader: ShaderDescriptor): ConfigStructDescripto
     let structAlignment = 0;
     const members: Record<string, ConfigMemberDescriptor> = {};
 
-    for (const [id, type] of Object.entries(KNOWN_ATTRIBUTES)) {
+    const addMember = (name: string, type: ValueType, kind: ConfigMemberKind) => {
+        // Prefix all the attributes names with `attr_` to avoid conflict with other property names.
+        const memberName = kind === ConfigMemberKind.Attribute ? `attr_${name}` : name;
+
         const valueSize = sizeOfValue(type);
         const valueAlignment = alignmentOfProperty(type);
         const valueOffset = Math.ceil(currentOffset / valueAlignment) * valueAlignment;
 
-        members[id] = {
-            kind: ConfigMemberKind.Attribute,
-            type: type,
+        if (Object.hasOwn(members, memberName)) {
+            throw new Error(`Member ${name} is already defined.`);
+        }
+
+        members[memberName] = {
+            kind,
+            name,
+            type,
             offset: valueOffset,
         };
 
         currentOffset = valueOffset + valueSize;
         structAlignment = Math.max(structAlignment, valueAlignment);
+    };
+
+    for (const [id, type] of Object.entries(KNOWN_ATTRIBUTES)) {
+        addMember(id, type, ConfigMemberKind.Attribute);
     }
 
     for (const [id, { type }] of Object.entries(shader.properties)) {
-        const valueSize = sizeOfValue(type);
-        const valueAlignment = alignmentOfProperty(type);
-        const valueOffset = Math.ceil(currentOffset / valueAlignment) * valueAlignment;
-
-        members[id] = {
-            kind: ConfigMemberKind.Property,
-            type: type,
-            offset: valueOffset,
-        };
-
-        currentOffset = valueOffset + valueSize;
-        structAlignment = Math.max(structAlignment, valueAlignment);
+        addMember(id, type, ConfigMemberKind.Property);
     }
 
     if (structAlignment !== 0) {

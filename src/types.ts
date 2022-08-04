@@ -74,6 +74,7 @@ export interface ShaderIOType {
 export interface CompilerShader {
     render(
         properties: Record<string, Value>,
+        attributes: Record<string, Value>,
         inputs: Record<string, Texture | null>,
         outputs: Record<string, Texture>,
     ): void;

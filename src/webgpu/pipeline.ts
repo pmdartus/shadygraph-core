@@ -1,5 +1,4 @@
 import { wgsl } from '../utils/wgsl';
-import { createFloat1 } from '../value';
 
 import { WebGpuTexture } from './texture';
 import { createShaderModule } from './module';
@@ -121,15 +120,11 @@ export async function createCompiledShader(
     return {
         render(
             properties: Record<string, Value>,
+            attributes: Record<string, Value>,
             inputs: Record<string, WebGpuTexture | null>,
             outputs: Record<string, WebGpuTexture>,
         ): void {
-            shaderConfig.writePropertiesBuffer(
-                {
-                    seed: createFloat1([1.2902]),
-                },
-                properties,
-            );
+            shaderConfig.writePropertiesBuffer(attributes, properties);
 
             const encoder = device.createCommandEncoder();
             {

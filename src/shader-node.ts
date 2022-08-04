@@ -2,6 +2,7 @@ import { GraphContext } from './graph';
 import { AbstractBaseNode, BaseSerializedNode, NodeConfig } from './node';
 
 import type { ExecutionContext, Node } from './types';
+import { createFloat1, createInt1 } from './value';
 
 export interface ShaderNodeConfig extends NodeConfig {
     shader: string;
@@ -50,7 +51,12 @@ export class ShaderNode extends AbstractBaseNode implements Node {
         const inputs = ctx.getInputs();
         const outputs = ctx.getOutputs();
 
+        const attributes = {
+            seed: createFloat1([1.2902]),
+            size: createInt1([ctx.graph.size]),
+        };
+
         const compiledShader = await ctx.engine.getCompiledShader(this.shader);
-        compiledShader.render(properties, inputs, outputs);
+        compiledShader.render(properties, attributes, inputs, outputs);
     }
 }

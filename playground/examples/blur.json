@@ -1,0 +1,80 @@
+{
+    "id": "blur",
+    "label": "Blur",
+    "size": 512,
+    "nodes": {
+        "MonaLisa": {
+            "id": "MonaLisa",
+            "type": "builtin",
+            "nodeType": "bitmap",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "value": "/assets/mona-lisa.jpeg"
+                }
+            }
+        },
+        "Square": {
+            "id": "Square",
+            "type": "shader",
+            "shader": "#square",
+            "properties": {
+                "size": {
+                    "type": "float1",
+                    "value": [0.5]
+                }
+            }
+        },
+        "Blur": {
+            "id": "Blur",
+            "type": "shader",
+            "shader": "#blur",
+            "properties": {}
+        },
+        "Blur_L": {
+            "id": "Blur_L",
+            "type": "shader",
+            "shader": "#blur",
+            "properties": {
+                "intensity": {
+                    "type": "int1",
+                    "value": [100]
+                }
+            }
+        },
+        "Blur-square_M": {
+            "id": "Blur-square_M",
+            "type": "shader",
+            "shader": "#blur",
+            "properties": {
+                "intensity": {
+                    "type": "int1",
+                    "value": [50]
+                }
+            }
+        }
+    },
+    "edges": {
+        "MonaLisa_Blur": {
+            "id": "MonaLisa_Blur",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Blur",
+            "toPort": "input"
+        },
+        "MonaLisa_Blur_L": {
+            "id": "MonaLisa_Blur_L",
+            "from": "MonaLisa",
+            "fromPort": "output",
+            "to": "Blur_L",
+            "toPort": "input"
+        },
+        "Square_Blur-square_M": {
+            "id": "Square_Blur-square_M",
+            "from": "Square",
+            "fromPort": "output",
+            "to": "Blur-square_M",
+            "toPort": "input"
+        }
+    }
+}

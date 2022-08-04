@@ -1,4 +1,5 @@
 import BLEND from './blend';
+import BLUR from './blur';
 import CHECKER from './checker';
 import COLOR_TO_GRAYSCALE from './color-to-grayscale';
 import CONTRAST_LUMINOSITY from './contrast-luminosity';
@@ -17,6 +18,7 @@ import WHITE_NOISE from './whitenoise';
 
 export const shaders = [
     BLEND,
+    BLUR,
     CHECKER,
     COLOR_TO_GRAYSCALE,
     CONTRAST_LUMINOSITY,
