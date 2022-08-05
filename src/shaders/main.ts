@@ -8,13 +8,15 @@ import GRADIENT_AXIAL from './gradient-axial';
 import GRADIENT_RADIAL from './gradient-radial';
 import GRAYSCALE_TO_COLOR from './grayscale-to-color';
 import INVERT from './invert';
+import PERLIN_NOISE from './perlin-noise';
 import MIRROR from './mirror';
 import RGBA_SPLIT from './rgba-split';
 import RGBA_MERGE from './rgba-merge';
 import SQUARE from './square';
 import TRANSFORM_2D from './transform-2d';
 import UNIFORM_COLOR from './uniform-color';
-import WHITE_NOISE from './whitenoise';
+import VALUE_NOISE from './value-noise';
+import WHITE_NOISE from './white-noise';
 
 export const shaders = [
     BLEND,
@@ -27,11 +29,13 @@ export const shaders = [
     GRADIENT_RADIAL,
     GRAYSCALE_TO_COLOR,
     INVERT,
+    PERLIN_NOISE,
     RGBA_SPLIT,
     RGBA_MERGE,
     MIRROR,
     SQUARE,
     TRANSFORM_2D,
     UNIFORM_COLOR,
+    VALUE_NOISE,
     WHITE_NOISE,
 ];

@@ -6,6 +6,8 @@ const examples = import.meta.glob<SerializedGraph>('./examples/*.json', {
 });
 
 const select = document.querySelector('select')!;
+const previewToggle = document.querySelector('#preview-size-toggle') as HTMLInputElement;
+
 const root = document.querySelector('#container')!;
 
 const backend = await WebGPUBackend.create();
@@ -42,21 +44,19 @@ function renderPreviews(graph: Graph) {
             outputContainer.textContent = `${outputId}`;
             container.appendChild(outputContainer);
 
-            const previewCanvas = createPreviewCanvas(outputContainer, 128);
+            const previewCanvas = createPreviewCanvas(outputContainer);
             backend.renderTexture(outputTexture as any, previewCanvas);
         }
     }
 }
 
-function createPreviewCanvas(target: HTMLElement, size: number): HTMLCanvasElement {
+function createPreviewCanvas(target: HTMLElement): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
+    canvas.className = 'preview';
     target.appendChild(canvas);
 
     canvas.width = 512;
     canvas.height = 512;
-
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
 
     return canvas;
 }
@@ -73,12 +73,19 @@ function setupSelectDropdown() {
     select.addEventListener('change', () => {
         const { value } = select;
 
-        updateQueyString({ id: value });
+        updateQueryString({ id: value });
         renderExample(value);
     });
 }
 
-function updateQueyString({ id, replace = false }: { id: string; replace?: boolean }) {
+function setupToggle() {
+    previewToggle.addEventListener('change', (evt) => {
+        const { checked } = evt.target as HTMLInputElement;
+        root.classList.toggle('large-preview', checked);
+    });
+}
+
+function updateQueryString({ id, replace = false }: { id: string; replace?: boolean }) {
     const updatedUrl = new URL(window.location.href);
     updatedUrl.searchParams.set('example', id);
 
@@ -93,13 +100,14 @@ function run() {
     const url = new URL(window.location.href);
 
     setupSelectDropdown();
+    setupToggle();
 
     let example = url.searchParams.get('example');
     if (example) {
         select.value = example;
     } else {
         example = select.value;
-        updateQueyString({ id: example, replace: true });
+        updateQueryString({ id: example, replace: true });
     }
 
     renderExample(example);

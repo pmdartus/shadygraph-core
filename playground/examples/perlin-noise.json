@@ -1,0 +1,25 @@
+{
+    "id": "perlin-noise",
+    "label": "Perlin Noise",
+    "size": 512,
+    "nodes": {
+        "Noise": {
+            "id": "Noise",
+            "type": "shader",
+            "shader": "#perlin-noise",
+            "properties": {}
+        },
+        "Noise_L": {
+            "id": "Noise_L",
+            "type": "shader",
+            "shader": "#perlin-noise",
+            "properties": {
+                "scale": {
+                    "type": "int1",
+                    "value": [16]
+                }
+            }
+        }
+    },
+    "edges": {}
+}

@@ -4,10 +4,27 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Playground</title>
+
+        <style>
+            canvas.preview {
+                width: 128px;
+                height: 128px;
+            }
+
+            .large-preview canvas.preview {
+                width: unset;
+                height: unset;
+            }
+        </style>
     </head>
     <body>
         <label for="example">Example:</label>
         <select id="example"></select>
+
+        <label for="preview-size-toggle">Large preview</label>
+        <input type="checkbox" id="preview-size-toggle" />
+
+        <hr />
 
         <div id="container"></div>
 

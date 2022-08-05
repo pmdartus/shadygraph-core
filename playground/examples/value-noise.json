@@ -1,0 +1,25 @@
+{
+    "id": "value-noise",
+    "label": "Value Noise",
+    "size": 512,
+    "nodes": {
+        "Noise": {
+            "id": "Noise",
+            "type": "shader",
+            "shader": "#value-noise",
+            "properties": {}
+        },
+        "Noise_L": {
+            "id": "Noise_L",
+            "type": "shader",
+            "shader": "#value-noise",
+            "properties": {
+                "scale": {
+                    "type": "int1",
+                    "value": [16]
+                }
+            }
+        }
+    },
+    "edges": {}
+}
