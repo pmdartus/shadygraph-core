@@ -1,0 +1,58 @@
+{
+    "id": "voronoi-noise",
+    "label": "Voronoi Noise",
+    "size": 512,
+    "nodes": {
+        "Noise": {
+            "id": "Noise",
+            "type": "shader",
+            "shader": "#voronoi-noise",
+            "properties": {}
+        },
+        "Noise_L": {
+            "id": "Noise_L",
+            "type": "shader",
+            "shader": "#voronoi-noise",
+            "properties": {
+                "scale": {
+                    "type": "int1",
+                    "value": [16]
+                }
+            }
+        },
+        "Noise_Manhattan": {
+            "id": "Noise_Manhattan",
+            "type": "shader",
+            "shader": "#voronoi-noise",
+            "properties": {
+                "distance": {
+                    "type": "int1",
+                    "value": [1]
+                }
+            }
+        },
+        "Noise_Chebychev": {
+            "id": "Noise_Chebychev",
+            "type": "shader",
+            "shader": "#voronoi-noise",
+            "properties": {
+                "distance": {
+                    "type": "int1",
+                    "value": [2]
+                }
+            }
+        },
+        "Noise_Randomness-low": {
+            "id": "Noise_Randomness-low",
+            "type": "shader",
+            "shader": "#voronoi-noise",
+            "properties": {
+                "randomness": {
+                    "type": "float1",
+                    "value": [0.2]
+                }
+            }
+        }
+    },
+    "edges": {}
+}

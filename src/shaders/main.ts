@@ -16,6 +16,7 @@ import SQUARE from './square';
 import TRANSFORM_2D from './transform-2d';
 import UNIFORM_COLOR from './uniform-color';
 import VALUE_NOISE from './value-noise';
+import VORONOI_NOISE from './voronoi-noise';
 import WHITE_NOISE from './white-noise';
 
 export const shaders = [
@@ -37,5 +38,6 @@ export const shaders = [
     TRANSFORM_2D,
     UNIFORM_COLOR,
     VALUE_NOISE,
+    VORONOI_NOISE,
     WHITE_NOISE,
 ];
