@@ -40,7 +40,7 @@ class ExecutionContextImpl implements ExecutionContext {
     }
 
     getInput(name: string): Texture | null {
-        if (!Object.hasOwn(this.#node.descriptor.inputs, name)) {
+        if (!this.#node.getInput(name)) {
             throw new Error(`Input "${name}" does not exist`);
         }
 
@@ -57,14 +57,15 @@ class ExecutionContextImpl implements ExecutionContext {
 
     getInputs(): Record<string, Texture | null> {
         return Object.fromEntries(
-            Object.keys(this.#node.descriptor.inputs).map((name) => {
+            Object.keys(this.#node.getInputs()).map((name) => {
                 return [name, this.getInput(name)];
             }),
         );
     }
 
     getOutput(name: string): Texture {
-        if (!Object.hasOwn(this.#node.descriptor.outputs, name)) {
+        const output = this.#node.getOutput(name);
+        if (!output) {
             throw new Error(`Output "${name}" does not exist`);
         }
 
@@ -72,7 +73,7 @@ class ExecutionContextImpl implements ExecutionContext {
             return this.#node.outputs[name];
         } else {
             return (this.#node.outputs[name] = this.#engine.backend.createTexture({
-                type: this.#node.descriptor.outputs[name].type,
+                type: output.type,
                 size: this.#graph.size,
             }));
         }
@@ -80,7 +81,7 @@ class ExecutionContextImpl implements ExecutionContext {
 
     getOutputs(): Record<string, Texture> {
         return Object.fromEntries(
-            Object.keys(this.#node.descriptor.outputs).map((name) => {
+            Object.keys(this.#node.getOutputs()).map((name) => {
                 return [name, this.getOutput(name)];
             }),
         );

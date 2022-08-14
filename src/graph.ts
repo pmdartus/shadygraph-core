@@ -153,7 +153,7 @@ export class Graph {
         for (const [id, serializedEdge] of Object.entries(json.edges)) {
             const edge = EdgeImpl.fromJSON(serializedEdge);
 
-            const validationResult = isValidEdge(edge, graph);
+            const validationResult = isValidEdge(graph, edge);
             if (!validationResult.isValid) {
                 throw new Error(`Invalid edge: ${validationResult.reason}`);
             }

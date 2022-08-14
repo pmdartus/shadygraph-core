@@ -5,7 +5,7 @@ import { createShaderModule } from './module';
 import { ShaderConfig } from './shader-config';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
-import type { Value, ShaderDescriptor, CompilerShader, ShaderIOType } from '../types';
+import type { Value, ShaderDescriptor, CompilerShader, IOType } from '../types';
 
 export async function createCompiledShader(
     device: GPUDevice,
@@ -24,8 +24,6 @@ export async function createCompiledShader(
         label: `ShaderModule:Fragment:${id}`,
         code: getShaderSource(shader, shaderConfig),
     });
-
-    console.log(getShaderSource(shader, shaderConfig));
 
     const propertiesBindGroupLayout = device.createBindGroupLayout({
         label: `Properties:${id}`,
@@ -212,7 +210,7 @@ function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string
     `;
 }
 
-function ioTypeToWgslType(ioType: ShaderIOType): string {
+function ioTypeToWgslType(ioType: IOType): string {
     switch (ioType.type) {
         case 'grayscale':
             return 'f32';
@@ -221,7 +219,7 @@ function ioTypeToWgslType(ioType: ShaderIOType): string {
     }
 }
 
-function ioTypeToTextureFormat(ioType: ShaderIOType): GPUTextureFormat {
+function ioTypeToTextureFormat(ioType: IOType): GPUTextureFormat {
     switch (ioType.type) {
         case 'grayscale':
             return 'r8unorm';

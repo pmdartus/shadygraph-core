@@ -1,13 +1,13 @@
 import { Graph } from './graph';
 import { uuid } from './utils/uuid';
 
-import type { Edge } from './types';
+import { Edge, Node } from './types';
 
 export type EdgeConfig = Omit<Edge, 'id'>;
 export type SerializedEdge = any;
 
 export class EdgeImpl implements Edge {
-    id: string;
+    readonly id: string;
     from: string;
     fromPort: string;
     to: string;
@@ -42,16 +42,16 @@ export class EdgeImpl implements Edge {
 }
 
 export function isValidEdge(
-    config: EdgeConfig,
     graph: Graph,
+    config: EdgeConfig,
 ): { isValid: true } | { isValid: false; reason: string } {
     const fromNode = graph.getNode(config.from);
     if (!fromNode) {
         return { isValid: false, reason: `No node found with id ${config.from}` };
     }
 
-    const fromDescriptor = fromNode.descriptor;
-    if (!Object.hasOwn(fromDescriptor.outputs, config.fromPort)) {
+    const outputDesc = fromNode.getOutput(config.fromPort);
+    if (!outputDesc) {
         return { isValid: false, reason: `No output found with name ${config.fromPort}` };
     }
 
@@ -60,10 +60,18 @@ export function isValidEdge(
         return { isValid: false, reason: `No node found with id ${config.to}` };
     }
 
-    const toDescriptor = toNode.descriptor;
-    if (!Object.hasOwn(toDescriptor.inputs, config.toPort)) {
+    const inputDesc = toNode.getInput(config.toPort);
+    if (!inputDesc) {
         return { isValid: false, reason: `No input found with name ${config.toPort}` };
     }
+
+    // TODO: Add IO type validation.
+    // if (outputDesc.type !== inputDesc.type) {
+    //     return {
+    //         isValid: false,
+    //         reason: `Output type ${outputDesc.type} does not match input type ${inputDesc.type}`,
+    //     };
+    // }
 
     const isInputAlreadyConnected = graph
         .getIncomingEdges(toNode)
@@ -72,7 +80,39 @@ export function isValidEdge(
         return { isValid: false, reason: `Input ${config.toPort} is already connected` };
     }
 
-    // TODO: Add cycle detection.
+    const hasCycle = checkCycles(graph, config);
+    if (hasCycle) {
+        return { isValid: false, reason: 'Cycle detected' };
+    }
 
     return { isValid: true };
+}
+
+function checkCycles(graph: Graph, config: EdgeConfig): boolean {
+    const fromNode = graph.getNode(config.from)!;
+    const toNode = graph.getNode(config.to)!;
+
+    let current: Node | undefined;
+    const visited: Set<Node> = new Set();
+    const stack: Node[] = [toNode];
+
+    // eslint-disable-next-line no-cond-assign
+    while ((current = stack.pop())) {
+        if (visited.has(current)) {
+            continue;
+        }
+
+        visited.add(current);
+
+        for (const edge of graph.getOutgoingEdges(current)) {
+            const toNode = graph.getNode(edge.to)!;
+            if (toNode === fromNode) {
+                return true;
+            }
+
+            stack.push(toNode);
+        }
+    }
+
+    return false;
 }

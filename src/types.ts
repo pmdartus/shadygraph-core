@@ -66,7 +66,7 @@ export type PropertyType =
 
 export type TextureType = 'color' | 'grayscale';
 
-export interface ShaderIOType {
+export interface IOType {
     label: string;
     type: TextureType;
 }
@@ -115,8 +115,8 @@ export interface Engine {
 
 export interface NodeDescriptor {
     properties: Record<string, PropertyType>;
-    inputs: Record<string, ShaderIOType>;
-    outputs: Record<string, ShaderIOType>;
+    inputs: Record<string, IOType>;
+    outputs: Record<string, IOType>;
 }
 
 export interface ShaderDescriptor extends NodeDescriptor {
@@ -140,17 +140,19 @@ interface Serializable<T = any> {
 }
 
 export interface Node extends Serializable {
-    id: string;
-    descriptor: NodeDescriptor;
-    properties: Record<string, Value>;
+    readonly id: string;
     outputs: Record<string, Texture>;
+    getInput(name: string): IOType | null;
+    getInputs(): Record<string, IOType>;
+    getOutput(name: string): IOType | null;
+    getOutputs(): Record<string, IOType>;
     getProperty<T extends Value>(name: string): T | null;
     getProperties(): Record<string, Value>;
     execute(ctx: ExecutionContext): void | Promise<void>;
 }
 
 export interface Edge extends Serializable {
-    id: string;
+    readonly id: string;
     from: string;
     fromPort: string;
     to: string;
