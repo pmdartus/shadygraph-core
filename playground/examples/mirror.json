@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "MirrorX": {
             "id": "MirrorX",
-            "type": "shader",
-            "shader": "#mirror",
+            "descriptor": "#mirror",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -27,8 +25,7 @@
         },
         "MirrorX_Offset1": {
             "id": "MirrorX_Offset1",
-            "type": "shader",
-            "shader": "#mirror",
+            "descriptor": "#mirror",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -42,8 +39,7 @@
         },
         "MirrorX_Offset2": {
             "id": "MirrorX_Offset2",
-            "type": "shader",
-            "shader": "#mirror",
+            "descriptor": "#mirror",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -57,8 +53,7 @@
         },
         "MirrorY": {
             "id": "MirrorY",
-            "type": "shader",
-            "shader": "#mirror",
+            "descriptor": "#mirror",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -68,8 +63,7 @@
         },
         "MirrorXY": {
             "id": "MirrorXY",
-            "type": "shader",
-            "shader": "#mirror",
+            "descriptor": "#mirror",
             "properties": {
                 "mode": {
                     "type": "int1",

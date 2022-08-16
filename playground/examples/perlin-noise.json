@@ -5,14 +5,12 @@
     "nodes": {
         "Noise": {
             "id": "Noise",
-            "type": "shader",
-            "shader": "#perlin-noise",
+            "descriptor": "#perlin-noise",
             "properties": {}
         },
         "Noise_L": {
             "id": "Noise_L",
-            "type": "shader",
-            "shader": "#perlin-noise",
+            "descriptor": "#perlin-noise",
             "properties": {
                 "scale": {
                     "type": "int1",

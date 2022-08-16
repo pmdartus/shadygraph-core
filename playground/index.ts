@@ -35,7 +35,7 @@ function renderPreviews(graph: Graph) {
 
     for (const node of graph.iterNodes()) {
         const container = document.createElement('div');
-        container.textContent = node.toString();
+        container.textContent = `${node.label} [id: ${node.id}]`;
 
         root.appendChild(container);
 

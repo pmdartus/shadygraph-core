@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,14 +15,12 @@
         },
         "Default": {
             "id": "Default",
-            "type": "shader",
-            "shader": "#contrast-luminosity",
+            "descriptor": "#contrast-luminosity",
             "properties": {}
         },
         "Luminosity-Plus": {
             "id": "Luminosity-Plus",
-            "type": "shader",
-            "shader": "#contrast-luminosity",
+            "descriptor": "#contrast-luminosity",
             "properties": {
                 "luminosity": {
                     "type": "float1",
@@ -33,8 +30,7 @@
         },
         "Luminosity-Minus": {
             "id": "Luminosity-Minus",
-            "type": "shader",
-            "shader": "#contrast-luminosity",
+            "descriptor": "#contrast-luminosity",
             "properties": {
                 "luminosity": {
                     "type": "float1",
@@ -44,8 +40,7 @@
         },
         "Contrast-Plus": {
             "id": "Contrast-Plus",
-            "type": "shader",
-            "shader": "#contrast-luminosity",
+            "descriptor": "#contrast-luminosity",
             "properties": {
                 "contrast": {
                     "type": "float1",
@@ -55,8 +50,7 @@
         },
         "Contrast-Minus": {
             "id": "Contrast-Minus",
-            "type": "shader",
-            "shader": "#contrast-luminosity",
+            "descriptor": "#contrast-luminosity",
             "properties": {
                 "contrast": {
                     "type": "float1",

@@ -19,7 +19,7 @@ import VALUE_NOISE from './value-noise';
 import VORONOI_NOISE from './voronoi-noise';
 import WHITE_NOISE from './white-noise';
 
-export const shaders = [
+export const descriptors = [
     BLEND,
     BLUR,
     CHECKER,

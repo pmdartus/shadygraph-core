@@ -1,3 +1,17 @@
-import { AbstractBuiltinNode } from '../builtin-node';
+import { createNodeDescriptor } from './utils';
 
-export class InputNode extends AbstractBuiltinNode {}
+export default createNodeDescriptor({
+    id: '#input',
+    label: 'Input',
+    properties: {},
+    inputs: {},
+    outputs: {
+        output: {
+            label: 'Output',
+            type: 'color',
+        },
+    },
+    execute(_ctx) {
+        throw new Error('Not implemented.');
+    },
+});

@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "Square": {
             "id": "Square",
-            "type": "shader",
-            "shader": "#square",
+            "descriptor": "#square",
             "properties": {
                 "size": {
                     "type": "float1",
@@ -27,14 +25,12 @@
         },
         "Blur": {
             "id": "Blur",
-            "type": "shader",
-            "shader": "#blur",
+            "descriptor": "#blur",
             "properties": {}
         },
         "Blur_L": {
             "id": "Blur_L",
-            "type": "shader",
-            "shader": "#blur",
+            "descriptor": "#blur",
             "properties": {
                 "intensity": {
                     "type": "int1",
@@ -44,8 +40,7 @@
         },
         "Blur-square_M": {
             "id": "Blur-square_M",
-            "type": "shader",
-            "shader": "#blur",
+            "descriptor": "#blur",
             "properties": {
                 "intensity": {
                     "type": "int1",

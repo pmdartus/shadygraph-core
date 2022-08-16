@@ -5,14 +5,12 @@
     "nodes": {
         "Disc": {
             "id": "Disc",
-            "type": "shader",
-            "shader": "#disc",
+            "descriptor": "#disc",
             "properties": {}
         },
         "Grayscale_Color": {
             "id": "Grayscale_Color",
-            "type": "shader",
-            "shader": "#grayscale-to-color",
+            "descriptor": "#grayscale-to-color",
             "properties": {}
         }
     },

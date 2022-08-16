@@ -5,12 +5,12 @@ import { createShaderModule } from './module';
 import { ShaderConfig } from './shader-config';
 import { VERTEX_SHADER_CODE } from './shader-source';
 
-import type { Value, ShaderDescriptor, CompilerShader, IOType } from '../types';
+import type { Value, ShaderNodeDescriptor, CompiledShader, IOType } from '../types';
 
 export async function createCompiledShader(
     device: GPUDevice,
-    shader: ShaderDescriptor,
-): Promise<CompilerShader> {
+    shader: ShaderNodeDescriptor,
+): Promise<CompiledShader> {
     const { id } = shader;
 
     const shaderConfig = ShaderConfig.create(device, shader);
@@ -175,7 +175,7 @@ export async function createCompiledShader(
     };
 }
 
-function getShaderSource(shader: ShaderDescriptor, config: ShaderConfig): string {
+function getShaderSource(shader: ShaderNodeDescriptor, config: ShaderConfig): string {
     const configStruct = config.toWgsl();
     const outputStruct = wgsl`
         struct Output {

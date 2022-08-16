@@ -1,15 +1,8 @@
+import { NodeImpl } from './node';
 import { EdgeImpl, isValidEdge, SerializedEdge } from './edge';
-
 import { uuid } from './utils/uuid';
 
-import { ShaderNode } from './shader-node';
-import { BuiltInNodeType } from './builtin-node';
-import { InputNode } from './builtins/input';
-import { OutputNode } from './builtins/output';
-import { BitmapNode } from './builtins/bitmap';
-import { SvgNode } from './builtins/svg';
-
-import type { Engine, Node, Edge } from './types';
+import type { Engine, Node, Edge, Value } from './types';
 
 export interface GraphConfig {
     size?: number;
@@ -20,8 +13,14 @@ export interface SerializedGraph {
     id: string;
     size: number;
     label: string;
-    nodes: Record<string, any>;
+    nodes: Record<string, SerializedNode>;
     edges: Record<string, SerializedEdge>;
+}
+
+interface SerializedNode {
+    id: string;
+    descriptor: string;
+    properties: Record<string, Value>;
 }
 
 export interface GraphContext {
@@ -57,19 +56,6 @@ export class Graph {
 
     getIncomingEdges(node: Node): Edge[] {
         return Array.from(this.#edgeMap.values()).filter((edge) => edge.to === node.id);
-    }
-
-    clone(): Graph {
-        const graph = new Graph({
-            id: this.id,
-            size: this.size,
-            label: this.label,
-        });
-
-        graph.#nodeMap = new Map(this.#nodeMap);
-        graph.#edgeMap = new Map(this.#edgeMap);
-
-        return graph;
     }
 
     *iterNodes(): Iterable<Node> {
@@ -120,32 +106,9 @@ export class Graph {
     static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): Graph {
         const graph = new Graph(json);
 
-        const graphCtx = { ...ctx, graph };
-
         for (const [id, serializedNode] of Object.entries(json.nodes)) {
-            let node: Node;
-
-            if (serializedNode.type === 'shader') {
-                node = ShaderNode.create(serializedNode, graphCtx);
-            } else {
-                switch (serializedNode.nodeType) {
-                    case BuiltInNodeType.Input:
-                        node = InputNode.create(serializedNode);
-                        break;
-
-                    case BuiltInNodeType.Output:
-                        node = OutputNode.create(serializedNode);
-                        break;
-
-                    case BuiltInNodeType.Bitmap:
-                        node = BitmapNode.create(serializedNode);
-                        break;
-
-                    case BuiltInNodeType.SVG:
-                        node = SvgNode.create(serializedNode);
-                        break;
-                }
-            }
+            const descriptor = ctx.engine.registry.getNodeDescriptor(serializedNode.descriptor);
+            const node = new NodeImpl({ ...serializedNode, descriptor });
 
             graph.#nodeMap.set(id, node!);
         }

@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "Color_GrayScale": {
             "id": "Color_GrayScale",
-            "type": "shader",
-            "shader": "#color-to-grayscale",
+            "descriptor": "#color-to-grayscale",
             "properties": {}
         }
     },

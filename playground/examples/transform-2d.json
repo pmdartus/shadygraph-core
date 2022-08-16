@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "Translation": {
             "id": "Translation",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "translation": {
                     "type": "float2",
@@ -27,8 +25,7 @@
         },
         "Rotation": {
             "id": "Rotation",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "rotation": {
                     "type": "float1",
@@ -38,8 +35,7 @@
         },
         "Rot_Trans": {
             "id": "Rot_Trans",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "rotation": {
                     "type": "float1",
@@ -53,8 +49,7 @@
         },
         "Scale_L": {
             "id": "Scale_L",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "scale": {
                     "type": "float2",
@@ -64,8 +59,7 @@
         },
         "Scale_S": {
             "id": "Scale_S",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "scale": {
                     "type": "float2",
@@ -75,8 +69,7 @@
         },
         "Scale_SX": {
             "id": "Scale_SX",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "scale": {
                     "type": "float2",
@@ -86,8 +79,7 @@
         },
         "Shear_X": {
             "id": "Shear_X",
-            "type": "shader",
-            "shader": "#transform-2d",
+            "descriptor": "#transform-2d",
             "properties": {
                 "shear": {
                     "type": "float2",

@@ -1,5 +1,4 @@
 import { createValue } from './value';
-
 import { uuid } from './utils/uuid';
 
 import type { ExecutionContext, Node, NodeDescriptor, IOType, Texture, Value } from './types';
@@ -16,7 +15,7 @@ export interface BaseSerializedNode {
     properties: Record<string, Value>;
 }
 
-export abstract class AbstractBaseNode implements Node {
+export class NodeImpl implements Node {
     readonly id: string;
     #descriptor: NodeDescriptor;
     #properties: Record<string, Value>;
@@ -27,6 +26,10 @@ export abstract class AbstractBaseNode implements Node {
         this.#descriptor = config.descriptor;
         this.#properties = config.properties ?? {};
         this.outputs = config.outputs ?? {};
+    }
+
+    get label() {
+        return this.#descriptor.label;
     }
 
     getInput(name: string): IOType | null {
@@ -70,7 +73,7 @@ export abstract class AbstractBaseNode implements Node {
         };
     }
 
-    async execute(_ctx: ExecutionContext) {
-        throw new Error('Not implemented');
+    execute(ctx: ExecutionContext) {
+        return this.#descriptor.execute(ctx);
     }
 }

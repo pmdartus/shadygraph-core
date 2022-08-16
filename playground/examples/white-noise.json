@@ -5,8 +5,7 @@
     "nodes": {
         "Noise": {
             "id": "Noise",
-            "type": "shader",
-            "shader": "#white-noise",
+            "descriptor": "#white-noise",
             "properties": {}
         }
     },

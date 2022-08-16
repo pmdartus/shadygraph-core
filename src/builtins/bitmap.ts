@@ -1,30 +1,26 @@
-import { AbstractBuiltinNode } from '../builtin-node';
+import { createNodeDescriptor } from './utils';
+import type { StringValue } from '../types';
 
-import type { ExecutionContext, NodeDescriptor, StringValue } from '../types';
-
-export class BitmapNode extends AbstractBuiltinNode {
-    static get descriptor(): NodeDescriptor {
-        return {
-            properties: {
-                source: {
-                    label: 'Source',
-                    type: 'string',
-                    description: 'The image source URL.',
-                    default: '',
-                },
-            },
-            inputs: {},
-            outputs: {
-                output: {
-                    label: 'Output',
-                    type: 'color',
-                },
-            },
-        };
-    }
-
-    async execute(ctx: ExecutionContext): Promise<void> {
-        const sourceValue = this.getProperty<StringValue>('source')!;
+export default createNodeDescriptor({
+    id: '#bitmap',
+    label: 'Bitmap',
+    properties: {
+        source: {
+            label: 'Source',
+            type: 'string',
+            description: 'The image source URL.',
+            default: '',
+        },
+    },
+    inputs: {},
+    outputs: {
+        output: {
+            label: 'Output',
+            type: 'color',
+        },
+    },
+    async execute(ctx) {
+        const sourceValue = ctx.getProperty<StringValue>('source')!;
 
         const response = await fetch(sourceValue.value);
         if (!response.ok) {
@@ -36,5 +32,5 @@ export class BitmapNode extends AbstractBuiltinNode {
 
         const texture = ctx.getOutput('output');
         ctx.backend.copyImageToTexture(bitmap, texture);
-    }
-}
+    },
+});

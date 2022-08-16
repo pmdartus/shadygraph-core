@@ -5,14 +5,12 @@
     "nodes": {
         "Default": {
             "id": "Default",
-            "type": "shader",
-            "shader": "#checker",
+            "descriptor": "#checker",
             "properties": {}
         },
         "Tiling_2": {
             "id": "Default",
-            "type": "shader",
-            "shader": "#checker",
+            "descriptor": "#checker",
             "properties": {
                 "tiling": {
                     "type": "int1",
@@ -22,8 +20,7 @@
         },
         "Tiling_10": {
             "id": "Default",
-            "type": "shader",
-            "shader": "#checker",
+            "descriptor": "#checker",
             "properties": {
                 "tiling": {
                     "type": "int1",
@@ -33,8 +30,7 @@
         },
         "Rotate": {
             "id": "Rotate",
-            "type": "shader",
-            "shader": "#checker",
+            "descriptor": "#checker",
             "properties": {
                 "rotate_45": {
                     "type": "boolean",

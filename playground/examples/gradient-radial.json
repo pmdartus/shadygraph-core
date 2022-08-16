@@ -5,14 +5,12 @@
     "nodes": {
         "A": {
             "id": "A",
-            "type": "shader",
-            "shader": "#gradient-radial",
+            "descriptor": "#gradient-radial",
             "properties": {}
         },
         "B": {
             "id": "B",
-            "type": "shader",
-            "shader": "#gradient-radial",
+            "descriptor": "#gradient-radial",
             "properties": {
                 "center": {
                     "type": "float2",
@@ -26,8 +24,7 @@
         },
         "C": {
             "id": "C",
-            "type": "shader",
-            "shader": "#gradient-radial",
+            "descriptor": "#gradient-radial",
             "properties": {
                 "center": {
                     "type": "float2",

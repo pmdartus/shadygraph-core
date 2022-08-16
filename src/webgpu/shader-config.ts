@@ -1,6 +1,6 @@
 import { wgsl } from '../utils/wgsl';
 
-import type { Value, ShaderDescriptor, ValueType } from '../types';
+import type { Value, ShaderNodeDescriptor, ValueType } from '../types';
 
 enum ConfigMemberKind {
     Attribute,
@@ -93,13 +93,13 @@ export class ShaderConfig {
         this.#buffer.destroy();
     }
 
-    static create(device: GPUDevice, shader: ShaderDescriptor): ShaderConfig {
+    static create(device: GPUDevice, shader: ShaderNodeDescriptor): ShaderConfig {
         const configDesc = createConfigDescriptor(shader);
         return new ShaderConfig(device, configDesc);
     }
 }
 
-function createConfigDescriptor(shader: ShaderDescriptor): ConfigStructDescriptor {
+function createConfigDescriptor(shader: ShaderNodeDescriptor): ConfigStructDescriptor {
     let currentOffset = 0;
     let structAlignment = 0;
     const members: Record<string, ConfigMemberDescriptor> = {};

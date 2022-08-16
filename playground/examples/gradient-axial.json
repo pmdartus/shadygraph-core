@@ -6,13 +6,13 @@
         "A": {
             "id": "A",
             "type": "shader",
-            "shader": "#gradient-axial",
+            "descriptor": "#gradient-axial",
             "properties": {}
         },
         "B": {
             "id": "B",
             "type": "shader",
-            "shader": "#gradient-axial",
+            "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
                     "type": "float2",
@@ -27,7 +27,7 @@
         "C": {
             "id": "C",
             "type": "shader",
-            "shader": "#gradient-axial",
+            "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
                     "type": "float2",
@@ -42,7 +42,7 @@
         "D": {
             "id": "D",
             "type": "shader",
-            "shader": "#gradient-axial",
+            "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
                     "type": "float2",
@@ -57,7 +57,7 @@
         "E": {
             "id": "E",
             "type": "shader",
-            "shader": "#gradient-axial",
+            "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
                     "type": "float2",

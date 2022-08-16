@@ -5,8 +5,7 @@
     "nodes": {
         "A": {
             "id": "A",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,15 +15,13 @@
         },
         "B": {
             "id": "B",
-            "type": "shader",
-            "properties": {},
-            "shader": "#invert"
+            "descriptor": "#invert",
+            "properties": {}
         },
         "C": {
             "id": "C",
-            "type": "shader",
-            "properties": {},
-            "shader": "#invert"
+            "descriptor": "#invert",
+            "properties": {}
         }
     },
     "edges": {

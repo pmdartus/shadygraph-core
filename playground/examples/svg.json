@@ -5,8 +5,7 @@
     "nodes": {
         "Rocket": {
             "id": "Rocket",
-            "type": "builtin",
-            "nodeType": "svg",
+            "descriptor": "#svg",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "Rocket_Red": {
             "id": "Rocket_Red",
-            "type": "builtin",
-            "nodeType": "svg",
+            "descriptor": "#svg",
             "properties": {
                 "source": {
                     "type": "string",

@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,14 +15,12 @@
         },
         "Split": {
             "id": "Split",
-            "type": "shader",
-            "shader": "#rgba-split",
+            "descriptor": "#rgba-split",
             "properties": {}
         },
         "Merge": {
             "id": "Merge",
-            "type": "shader",
-            "shader": "#rgba-merge",
+            "descriptor": "#rgba-merge",
             "properties": {}
         }
     },

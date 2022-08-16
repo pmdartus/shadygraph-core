@@ -71,7 +71,7 @@ export interface IOType {
     type: TextureType;
 }
 
-export interface CompilerShader {
+export interface CompiledShader {
     render(
         properties: Record<string, Value>,
         attributes: Record<string, Value>,
@@ -94,10 +94,14 @@ export interface Texture {
 }
 
 export interface Backend {
-    compileShader(descriptor: ShaderDescriptor): Promise<CompilerShader>;
+    compileShader(descriptor: ShaderNodeDescriptor): Promise<CompiledShader>;
     createTexture(config: TextureConfig): Texture;
     copyImageToTexture(source: ImageBitmap, target: Texture): void;
     waitUntilDone(): Promise<void>;
+}
+
+export interface Registry {
+    getNodeDescriptor(id: string): NodeDescriptor;
 }
 
 export interface EngineConfig {
@@ -106,22 +110,22 @@ export interface EngineConfig {
 
 export interface Engine {
     backend: Backend;
-    getShaderDescriptor(id: string): ShaderDescriptor | undefined;
-    getCompiledShader(id: string): Promise<CompilerShader>;
+    registry: Registry;
     createGraph(config: GraphConfig): Graph;
     loadGraph(serializedGraph: SerializedGraph): Graph;
     renderGraph(graph: Graph): Promise<void>;
 }
 
 export interface NodeDescriptor {
+    id: string;
+    label: string;
     properties: Record<string, PropertyType>;
     inputs: Record<string, IOType>;
     outputs: Record<string, IOType>;
+    execute(ctx: ExecutionContext): Promise<void>;
 }
 
-export interface ShaderDescriptor extends NodeDescriptor {
-    id: string;
-    label: string;
+export interface ShaderNodeDescriptor extends Omit<NodeDescriptor, 'execute'> {
     source: string;
 }
 
@@ -129,7 +133,8 @@ export interface ExecutionContext {
     engine: Engine;
     graph: Graph;
     backend: Backend;
-    getInput(name: string): Texture | null;
+    getProperty<T extends Value>(name: string): T | null;
+    getProperties(): Record<string, Value>;
     getInputs(): Record<string, Texture | null>;
     getOutput(name: string): Texture;
     getOutputs(): Record<string, Texture>;
@@ -141,6 +146,7 @@ interface Serializable<T = any> {
 
 export interface Node extends Serializable {
     readonly id: string;
+    readonly label: string;
     outputs: Record<string, Texture>;
     getInput(name: string): IOType | null;
     getInputs(): Record<string, IOType>;

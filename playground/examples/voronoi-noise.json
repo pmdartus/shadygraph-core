@@ -5,14 +5,12 @@
     "nodes": {
         "Noise": {
             "id": "Noise",
-            "type": "shader",
-            "shader": "#voronoi-noise",
+            "descriptor": "#voronoi-noise",
             "properties": {}
         },
         "Noise_L": {
             "id": "Noise_L",
-            "type": "shader",
-            "shader": "#voronoi-noise",
+            "descriptor": "#voronoi-noise",
             "properties": {
                 "scale": {
                     "type": "int1",
@@ -22,8 +20,7 @@
         },
         "Noise_Manhattan": {
             "id": "Noise_Manhattan",
-            "type": "shader",
-            "shader": "#voronoi-noise",
+            "descriptor": "#voronoi-noise",
             "properties": {
                 "distance": {
                     "type": "int1",
@@ -33,8 +30,7 @@
         },
         "Noise_Chebychev": {
             "id": "Noise_Chebychev",
-            "type": "shader",
-            "shader": "#voronoi-noise",
+            "descriptor": "#voronoi-noise",
             "properties": {
                 "distance": {
                     "type": "int1",
@@ -44,8 +40,7 @@
         },
         "Noise_Randomness-low": {
             "id": "Noise_Randomness-low",
-            "type": "shader",
-            "shader": "#voronoi-noise",
+            "descriptor": "#voronoi-noise",
             "properties": {
                 "randomness": {
                     "type": "float1",

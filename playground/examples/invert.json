@@ -5,8 +5,7 @@
     "nodes": {
         "A": {
             "id": "A",
-            "type": "shader",
-            "shader": "#uniform-color",
+            "descriptor": "#uniform-color",
             "properties": {
                 "color": {
                     "type": "float3",
@@ -16,15 +15,13 @@
         },
         "B": {
             "id": "B",
-            "type": "shader",
             "properties": {},
-            "shader": "#invert"
+            "descriptor": "#invert"
         },
         "C": {
             "id": "C",
-            "type": "shader",
             "properties": {},
-            "shader": "#invert"
+            "descriptor": "#invert"
         }
     },
     "edges": {

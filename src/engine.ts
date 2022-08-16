@@ -1,15 +1,14 @@
 import { Graph } from './graph';
-import { shaders } from './shaders/main';
+import { NodeRegistry } from './registry';
 
 import type {
     Backend,
-    CompilerShader,
     Engine,
     EngineConfig,
     ExecutionContext,
     Node,
-    ShaderDescriptor,
     Texture,
+    Value,
 } from './types';
 
 class ExecutionContextImpl implements ExecutionContext {
@@ -39,6 +38,13 @@ class ExecutionContextImpl implements ExecutionContext {
         return this.#node;
     }
 
+    getProperty<T extends Value>(name: string): T | null {
+        return this.#node.getProperty<T>(name);
+    }
+    getProperties(): Record<string, Value> {
+        return this.#node.getProperties();
+    }
+
     getInput(name: string): Texture | null {
         if (!this.#node.getInput(name)) {
             throw new Error(`Input "${name}" does not exist`);
@@ -54,7 +60,6 @@ class ExecutionContextImpl implements ExecutionContext {
             return fromNode.outputs[inputEdge.fromPort] ?? null;
         }
     }
-
     getInputs(): Record<string, Texture | null> {
         return Object.fromEntries(
             Object.keys(this.#node.getInputs()).map((name) => {
@@ -78,7 +83,6 @@ class ExecutionContextImpl implements ExecutionContext {
             }));
         }
     }
-
     getOutputs(): Record<string, Texture> {
         return Object.fromEntries(
             Object.keys(this.#node.getOutputs()).map((name) => {
@@ -90,38 +94,13 @@ class ExecutionContextImpl implements ExecutionContext {
 
 export function createEngine(config: EngineConfig): Engine {
     const { backend } = config;
-
-    const shaderMap = new Map<string, ShaderDescriptor>(
-        shaders.map((shader) => [shader.id, shader]),
-    );
-
-    const compiledShaderMap = new Map<ShaderDescriptor, CompilerShader>();
-    const compiledShaderPromiseMap = new Map<ShaderDescriptor, Promise<CompilerShader>>();
+    const registry = new NodeRegistry();
 
     const engine: Engine = {
         backend,
+        registry,
         createGraph(config) {
             return Graph.create(config);
-        },
-        getShaderDescriptor(id) {
-            return shaderMap.get(id);
-        },
-        getCompiledShader(id) {
-            const shaderDescriptor = shaderMap.get(id)!;
-            let shaderCompiledPromise = compiledShaderPromiseMap.get(shaderDescriptor);
-
-            if (!shaderCompiledPromise) {
-                shaderCompiledPromise = backend
-                    .compileShader(shaderDescriptor)
-                    .then((compilerShader) => {
-                        compiledShaderMap.set(shaderDescriptor, compilerShader);
-                        return compilerShader;
-                    });
-
-                compiledShaderPromiseMap.set(shaderDescriptor, shaderCompiledPromise);
-            }
-
-            return shaderCompiledPromise;
         },
         loadGraph(data) {
             return Graph.fromJSON(data, { engine });

@@ -5,8 +5,7 @@
     "nodes": {
         "MonaLisa": {
             "id": "MonaLisa",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -16,8 +15,7 @@
         },
         "PearlEarring": {
             "id": "PearlEarring",
-            "type": "builtin",
-            "nodeType": "bitmap",
+            "descriptor": "#bitmap",
             "properties": {
                 "source": {
                     "type": "string",
@@ -27,8 +25,7 @@
         },
         "Mask": {
             "id": "Mask",
-            "type": "shader",
-            "shader": "#disc",
+            "descriptor": "#disc",
             "properties": {
                 "size": {
                     "type": "float1",
@@ -38,14 +35,12 @@
         },
         "Default": {
             "id": "Default",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {}
         },
         "Normal": {
             "id": "Normal",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -59,8 +54,7 @@
         },
         "Add": {
             "id": "Add",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -70,8 +64,7 @@
         },
         "Subtract": {
             "id": "Subtract",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -81,8 +74,7 @@
         },
         "Multiply": {
             "id": "Multiply",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -92,8 +84,7 @@
         },
         "Multiply_Opacity": {
             "id": "Multiply_Opacity",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -107,8 +98,7 @@
         },
         "Divide": {
             "id": "Divide",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -118,8 +108,7 @@
         },
         "AddSub": {
             "id": "AddSub",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -129,8 +118,7 @@
         },
         "Max": {
             "id": "Max",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -140,8 +128,7 @@
         },
         "Min": {
             "id": "Min",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -151,8 +138,7 @@
         },
         "Overlay": {
             "id": "Overlay",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -162,8 +148,7 @@
         },
         "Screen": {
             "id": "Screen",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
@@ -173,8 +158,7 @@
         },
         "Masked": {
             "id": "Masked",
-            "type": "shader",
-            "shader": "#blend",
+            "descriptor": "#blend",
             "properties": {
                 "mode": {
                     "type": "int1",
