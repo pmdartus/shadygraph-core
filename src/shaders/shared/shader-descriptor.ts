@@ -9,7 +9,7 @@ export function createShaderDescriptor(desc: ShaderNodeDescriptor): NodeDescript
         ...desc,
         async execute(ctx) {
             if (!compiledShaderPromise) {
-                compiledShaderPromise = ctx.engine.backend.compileShader(desc);
+                compiledShaderPromise = ctx.backend.compileShader(desc);
             }
 
             const compileShader = await compiledShaderPromise;

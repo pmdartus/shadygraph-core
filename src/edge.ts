@@ -1,10 +1,11 @@
-import { Graph } from './graph';
+import { GraphImpl } from './graph';
 import { uuid } from './utils/uuid';
 
-import { Edge, Node } from './types';
+import { Edge, Node, SerializedEdge } from './types';
 
-export type EdgeConfig = Omit<Edge, 'id'>;
-export type SerializedEdge = any;
+export type EdgeConfig = Omit<SerializedEdge, 'id'> & {
+    id?: string;
+};
 
 export class EdgeImpl implements Edge {
     readonly id: string;
@@ -13,9 +14,8 @@ export class EdgeImpl implements Edge {
     to: string;
     toPort: string;
 
-    /** @internal */
-    constructor(config: Edge) {
-        this.id = config.id;
+    constructor(config: EdgeConfig) {
+        this.id = config.id ?? uuid();
         this.from = config.from;
         this.fromPort = config.fromPort;
         this.to = config.to;
@@ -37,12 +37,12 @@ export class EdgeImpl implements Edge {
     }
 
     static create(config: EdgeConfig): EdgeImpl {
-        return new EdgeImpl({ ...config, id: uuid() });
+        return new EdgeImpl(config);
     }
 }
 
 export function isValidEdge(
-    graph: Graph,
+    graph: GraphImpl,
     config: EdgeConfig,
 ): { isValid: true } | { isValid: false; reason: string } {
     const fromNode = graph.getNode(config.from);
@@ -88,7 +88,7 @@ export function isValidEdge(
     return { isValid: true };
 }
 
-function checkCycles(graph: Graph, config: EdgeConfig): boolean {
+function checkCycles(graph: GraphImpl, config: EdgeConfig): boolean {
     const fromNode = graph.getNode(config.from)!;
     const toNode = graph.getNode(config.to)!;
 

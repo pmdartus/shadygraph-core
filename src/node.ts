@@ -1,18 +1,21 @@
 import { createValue } from './value';
 import { uuid } from './utils/uuid';
 
-import type { ExecutionContext, Node, NodeDescriptor, IOType, Texture, Value } from './types';
+import type {
+    ExecutionContext,
+    IOType,
+    Node,
+    NodeDescriptor,
+    SerializedNode,
+    Texture,
+    Value,
+} from './types';
 
-export interface NodeConfig {
+interface NodeConfig {
     id?: string;
     descriptor: NodeDescriptor;
     properties?: Record<string, Value>;
     outputs?: Record<string, Texture>;
-}
-
-export interface BaseSerializedNode {
-    id: string;
-    properties: Record<string, Value>;
 }
 
 export class NodeImpl implements Node {
@@ -66,9 +69,10 @@ export class NodeImpl implements Node {
         );
     }
 
-    toJSON(): BaseSerializedNode {
+    toJSON(): SerializedNode {
         return {
             id: this.id,
+            descriptor: this.#descriptor.id,
             properties: this.#properties,
         };
     }

@@ -1,53 +1,28 @@
 import { NodeImpl } from './node';
-import { EdgeImpl, isValidEdge, SerializedEdge } from './edge';
+import { EdgeImpl, isValidEdge } from './edge';
 import { uuid } from './utils/uuid';
 
-import type { Engine, Node, Edge, Value } from './types';
+import type { Engine, Node, Edge, Graph, SerializedGraph, GraphConfig } from './types';
 
-export interface GraphConfig {
-    size?: number;
-    label?: string;
-}
-
-export interface SerializedGraph {
-    id: string;
-    size: number;
-    label: string;
-    nodes: Record<string, SerializedNode>;
-    edges: Record<string, SerializedEdge>;
-}
-
-interface SerializedNode {
-    id: string;
-    descriptor: string;
-    properties: Record<string, Value>;
-}
-
-export interface GraphContext {
-    engine: Engine;
-    graph: Graph;
-}
-
-export class Graph {
+export class GraphImpl implements Graph {
     id: string;
     size: number;
     label: string;
     #nodeMap = new Map<string, Node>();
     #edgeMap = new Map<string, Edge>();
 
-    /** @internal */
     constructor(config: { id: string; size: number; label: string }) {
         this.id = config.id;
         this.size = config.size;
         this.label = config.label;
     }
 
-    getNode(id: string): Node | undefined {
-        return this.#nodeMap.get(id);
+    getNode(id: string): Node | null {
+        return this.#nodeMap.get(id) ?? null;
     }
 
-    getEdge(id: string): Edge | undefined {
-        return this.#edgeMap.get(id);
+    getEdge(id: string): Edge | null {
+        return this.#edgeMap.get(id) ?? null;
     }
 
     getOutgoingEdges(node: Node): Edge[] {
@@ -103,8 +78,8 @@ export class Graph {
         };
     }
 
-    static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): Graph {
-        const graph = new Graph(json);
+    static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): GraphImpl {
+        const graph = new GraphImpl(json);
 
         for (const [id, serializedNode] of Object.entries(json.nodes)) {
             const descriptor = ctx.engine.registry.getNodeDescriptor(serializedNode.descriptor);
@@ -127,8 +102,8 @@ export class Graph {
         return graph;
     }
 
-    static create(config: GraphConfig): Graph {
-        return new Graph({
+    static create(config: GraphConfig): GraphImpl {
+        return new GraphImpl({
             id: uuid(),
             size: config.size ?? 512,
             label: config.label ?? '',

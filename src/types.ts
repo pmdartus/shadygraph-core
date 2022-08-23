@@ -1,5 +1,3 @@
-import { Graph, GraphConfig, SerializedGraph } from './graph';
-
 type ValueTypeMap = {
     boolean: boolean;
     float1: [number];
@@ -130,11 +128,11 @@ export interface ShaderNodeDescriptor extends Omit<NodeDescriptor, 'execute'> {
 }
 
 export interface ExecutionContext {
-    engine: Engine;
-    graph: Graph;
-    backend: Backend;
+    readonly graph: Graph;
+    readonly backend: Backend;
     getProperty<T extends Value>(name: string): T | null;
     getProperties(): Record<string, Value>;
+    getInput(name: string): Texture | null;
     getInputs(): Record<string, Texture | null>;
     getOutput(name: string): Texture;
     getOutputs(): Record<string, Texture>;
@@ -144,7 +142,28 @@ interface Serializable<T = any> {
     toJSON(): T;
 }
 
-export interface Node extends Serializable {
+export interface Graph extends Serializable<SerializedGraph> {
+    readonly id: string;
+    label: string;
+    size: number;
+    getNode(id: string): Node | null;
+    getEdge(id: string): Edge | null;
+    getIncomingEdges(node: Node): Edge[];
+    getOutgoingEdges(node: Node): Edge[];
+    iterNodes(): Iterable<Node>;
+}
+
+export type GraphConfig = Partial<Pick<Graph, 'label' | 'size'>>;
+
+export interface SerializedGraph {
+    id: string;
+    size: number;
+    label: string;
+    nodes: Record<string, SerializedNode>;
+    edges: Record<string, SerializedEdge>;
+}
+
+export interface Node extends Serializable<SerializedNode> {
     readonly id: string;
     readonly label: string;
     outputs: Record<string, Texture>;
@@ -157,8 +176,22 @@ export interface Node extends Serializable {
     execute(ctx: ExecutionContext): void | Promise<void>;
 }
 
-export interface Edge extends Serializable {
+export interface SerializedNode {
+    id: string;
+    descriptor: string;
+    properties: Record<string, Value>;
+}
+
+export interface Edge extends Serializable<SerializedEdge> {
     readonly id: string;
+    from: string;
+    fromPort: string;
+    to: string;
+    toPort: string;
+}
+
+export interface SerializedEdge {
+    id: string;
     from: string;
     fromPort: string;
     to: string;
