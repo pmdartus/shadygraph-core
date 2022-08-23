@@ -1,28 +1,84 @@
-import { NodeImpl } from './node';
-import { EdgeImpl, isValidEdge } from './edge';
+import { isValidEdge } from './edge';
 import { uuid } from './utils/uuid';
 
-import type { Engine, Node, Edge, Graph, SerializedGraph, GraphConfig } from './types';
+import type { Node, Edge, Graph, SerializedGraph, Id } from './types';
 
 export class GraphImpl implements Graph {
-    id: string;
+    id: Id;
     size: number;
     label: string;
-    #nodeMap = new Map<string, Node>();
-    #edgeMap = new Map<string, Edge>();
+    #nodeMap = new Map<Id, Node>();
+    #edgeMap = new Map<Id, Edge>();
 
-    constructor(config: { id: string; size: number; label: string }) {
-        this.id = config.id;
-        this.size = config.size;
-        this.label = config.label;
+    constructor(config: { id?: Id; size?: number; label?: string }) {
+        this.id = config.id ?? uuid();
+        this.size = config.size ?? 512;
+        this.label = config.label ?? '';
     }
 
-    getNode(id: string): Node | null {
-        return this.#nodeMap.get(id) ?? null;
+    hasNode(id: Id): boolean {
+        return this.#nodeMap.has(id);
     }
 
-    getEdge(id: string): Edge | null {
-        return this.#edgeMap.get(id) ?? null;
+    getNode(id: Id): Node {
+        const node = this.#nodeMap.get(id);
+        if (!node) {
+            throw new Error(`Node with id ${id} does not exist.`);
+        }
+
+        return node;
+    }
+
+    addNode(node: Node): void {
+        if (this.#nodeMap.has(node.id)) {
+            throw new Error(`Node with id ${node.id} already exists.`);
+        }
+
+        this.#nodeMap.set(node.id, node);
+    }
+
+    deleteNode(id: Id): Node {
+        const node = this.getNode(id);
+
+        for (const edge of this.getOutgoingEdges(node)) {
+            this.#edgeMap.delete(edge.id);
+        }
+        for (const edge of this.getIncomingEdges(node)) {
+            this.#edgeMap.delete(edge.id);
+        }
+
+        this.#nodeMap.delete(id);
+
+        return node;
+    }
+
+    getEdge(id: Id): Edge {
+        const edge = this.#edgeMap.get(id);
+        if (!edge) {
+            throw new Error(`Edge with id ${id} does not exist.`);
+        }
+
+        return edge;
+    }
+
+    addEdge(edge: Edge): void {
+        if (this.#edgeMap.has(edge.id)) {
+            throw new Error(`Edge with id ${edge.id} already exists.`);
+        }
+
+        const validationResult = isValidEdge(this, edge);
+        if (!validationResult.isValid) {
+            throw new Error(`Invalid edge: ${validationResult.reason}`);
+        }
+
+        this.#edgeMap.set(edge.id, edge);
+    }
+
+    deleteEdge(id: Id): Edge {
+        const edge = this.getEdge(id);
+        this.#edgeMap.delete(id);
+
+        return edge;
     }
 
     getOutgoingEdges(node: Node): Edge[] {
@@ -39,7 +95,7 @@ export class GraphImpl implements Graph {
         );
 
         for (const edge of this.#edgeMap.values()) {
-            const toNode = this.getNode(edge.to)!;
+            const toNode = this.getNode(edge.to);
             inDegrees.set(toNode, inDegrees.get(toNode)! + 1);
         }
 
@@ -51,7 +107,7 @@ export class GraphImpl implements Graph {
                     yield node;
 
                     for (const edge of this.getOutgoingEdges(node)) {
-                        const toNode = this.getNode(edge.to)!;
+                        const toNode = this.getNode(edge.to);
                         inDegrees.set(toNode, inDegrees.get(toNode)! - 1);
                     }
                 }
@@ -76,37 +132,5 @@ export class GraphImpl implements Graph {
             nodes,
             edges,
         };
-    }
-
-    static fromJSON(json: SerializedGraph, ctx: { engine: Engine }): GraphImpl {
-        const graph = new GraphImpl(json);
-
-        for (const [id, serializedNode] of Object.entries(json.nodes)) {
-            const descriptor = ctx.engine.registry.getNodeDescriptor(serializedNode.descriptor);
-            const node = new NodeImpl({ ...serializedNode, descriptor });
-
-            graph.#nodeMap.set(id, node!);
-        }
-
-        for (const [id, serializedEdge] of Object.entries(json.edges)) {
-            const edge = EdgeImpl.fromJSON(serializedEdge);
-
-            const validationResult = isValidEdge(graph, edge);
-            if (!validationResult.isValid) {
-                throw new Error(`Invalid edge: ${validationResult.reason}`);
-            }
-
-            graph.#edgeMap.set(id, edge);
-        }
-
-        return graph;
-    }
-
-    static create(config: GraphConfig): GraphImpl {
-        return new GraphImpl({
-            id: uuid(),
-            size: config.size ?? 512,
-            label: config.label ?? '',
-        });
     }
 }

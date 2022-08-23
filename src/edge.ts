@@ -1,20 +1,16 @@
 import { GraphImpl } from './graph';
 import { uuid } from './utils/uuid';
 
-import { Edge, Node, SerializedEdge } from './types';
-
-export type EdgeConfig = Omit<SerializedEdge, 'id'> & {
-    id?: string;
-};
+import { Edge, Id, Node, SerializedEdge } from './types';
 
 export class EdgeImpl implements Edge {
-    readonly id: string;
-    from: string;
-    fromPort: string;
-    to: string;
-    toPort: string;
+    readonly id: Id;
+    from: Id;
+    fromPort: Id;
+    to: Id;
+    toPort: Id;
 
-    constructor(config: EdgeConfig) {
+    constructor(config: { id?: Id; from: Id; fromPort: Id; to: Id; toPort: Id }) {
         this.id = config.id ?? uuid();
         this.from = config.from;
         this.fromPort = config.fromPort;
@@ -31,38 +27,31 @@ export class EdgeImpl implements Edge {
             toPort: this.toPort,
         };
     }
-
-    static fromJSON(json: SerializedEdge): EdgeImpl {
-        return new EdgeImpl(json);
-    }
-
-    static create(config: EdgeConfig): EdgeImpl {
-        return new EdgeImpl(config);
-    }
 }
 
 export function isValidEdge(
     graph: GraphImpl,
-    config: EdgeConfig,
+    edge: Edge,
 ): { isValid: true } | { isValid: false; reason: string } {
-    const fromNode = graph.getNode(config.from);
-    if (!fromNode) {
-        return { isValid: false, reason: `No node found with id ${config.from}` };
+    if (!graph.hasNode(edge.from)) {
+        return { isValid: false, reason: `No node found with id ${edge.from}` };
     }
 
-    const outputDesc = fromNode.getOutput(config.fromPort);
+    if (!graph.hasNode(edge.to)) {
+        return { isValid: false, reason: `No node found with id ${edge.to}` };
+    }
+
+    const fromNode = graph.getNode(edge.from);
+    const toNode = graph.getNode(edge.to);
+
+    const outputDesc = fromNode.getOutput(edge.fromPort);
     if (!outputDesc) {
-        return { isValid: false, reason: `No output found with name ${config.fromPort}` };
+        return { isValid: false, reason: `No output found with name ${edge.fromPort}` };
     }
 
-    const toNode = graph.getNode(config.to);
-    if (!toNode) {
-        return { isValid: false, reason: `No node found with id ${config.to}` };
-    }
-
-    const inputDesc = toNode.getInput(config.toPort);
+    const inputDesc = toNode.getInput(edge.toPort);
     if (!inputDesc) {
-        return { isValid: false, reason: `No input found with name ${config.toPort}` };
+        return { isValid: false, reason: `No input found with name ${edge.toPort}` };
     }
 
     // TODO: Add IO type validation.
@@ -75,12 +64,12 @@ export function isValidEdge(
 
     const isInputAlreadyConnected = graph
         .getIncomingEdges(toNode)
-        .some((edge) => edge.toPort === config.toPort);
+        .some((incomingEdge) => incomingEdge.toPort === edge.toPort);
     if (isInputAlreadyConnected) {
-        return { isValid: false, reason: `Input ${config.toPort} is already connected` };
+        return { isValid: false, reason: `Input ${edge.toPort} is already connected` };
     }
 
-    const hasCycle = checkCycles(graph, config);
+    const hasCycle = checkCycles(graph, edge);
     if (hasCycle) {
         return { isValid: false, reason: 'Cycle detected' };
     }
@@ -88,7 +77,7 @@ export function isValidEdge(
     return { isValid: true };
 }
 
-function checkCycles(graph: GraphImpl, config: EdgeConfig): boolean {
+function checkCycles(graph: GraphImpl, config: Edge): boolean {
     const fromNode = graph.getNode(config.from)!;
     const toNode = graph.getNode(config.to)!;
 

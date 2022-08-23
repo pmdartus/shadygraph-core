@@ -1,4 +1,4 @@
-import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '../src/main';
+import { WebGPUBackend, createEngine, Graph, SerializedGraph, loadGraph } from '../src/main';
 
 const examples = import.meta.glob<SerializedGraph>('./examples/*.json', {
     as: 'json',
@@ -17,7 +17,9 @@ const engine = createEngine({
 
 async function renderExample(id: string) {
     const data = examples[id];
-    const graph = engine.loadGraph(data);
+    engine.dispatch(loadGraph(data));
+
+    const graph = engine.getGraph(data.id);
 
     console.log(`Loaded graph: ${id}`);
 

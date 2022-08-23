@@ -24,17 +24,28 @@ function createValueFactory<T extends keyof ValueMap>(type: T, defaultValue: Val
     };
 }
 
+export function isValue<T extends keyof ValueMap>(value: Value, type: T): value is ValueMap[T] {
+    return value.type === type;
+}
+
 function isValueFactory<T extends keyof ValueMap>(type: T) {
     return (value: Value): value is ValueMap[T] => {
-        return value.type === type;
+        return isValue(value, type);
     };
+}
+
+export function assertValue<T extends keyof ValueMap>(
+    value: Value,
+    type: T,
+): asserts value is ValueMap[T] {
+    if (!isValue(value, type)) {
+        throw new Error(`Invalid value. Expected "${type}" but received "${value.type}".`);
+    }
 }
 
 function assertValueFactory<T extends keyof ValueMap>(type: T) {
     return (value: Value): asserts value is ValueMap[T] => {
-        if (value.type !== type) {
-            throw new Error(`Invalid value. Expected "${type}" but received "${value.type}".`);
-        }
+        return assertValue<T>(value, type);
     };
 }
 

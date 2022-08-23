@@ -1,3 +1,5 @@
+export type Id = string;
+
 type ValueTypeMap = {
     boolean: boolean;
     float1: [number];
@@ -98,8 +100,16 @@ export interface Backend {
     waitUntilDone(): Promise<void>;
 }
 
+type DispatchContext = Engine;
+
+export interface Action {
+    label: string;
+    execute(ctx: DispatchContext): void;
+    undo?(ctx: DispatchContext): void;
+}
+
 export interface Registry {
-    getNodeDescriptor(id: string): NodeDescriptor;
+    getNodeDescriptor(id: Id): NodeDescriptor;
 }
 
 export interface EngineConfig {
@@ -109,13 +119,17 @@ export interface EngineConfig {
 export interface Engine {
     backend: Backend;
     registry: Registry;
-    createGraph(config: GraphConfig): Graph;
-    loadGraph(serializedGraph: SerializedGraph): Graph;
+    dispatch(action: Action): void;
+    undo(): boolean;
+    addGraph(graph: Graph): void;
+    getGraph(id: Id): Graph;
+    getGraphs(): Record<Id, Graph>;
+    deleteGraph(id: Id): Graph;
     renderGraph(graph: Graph): Promise<void>;
 }
 
 export interface NodeDescriptor {
-    id: string;
+    id: Id;
     label: string;
     properties: Record<string, PropertyType>;
     inputs: Record<string, IOType>;
@@ -143,20 +157,23 @@ interface Serializable<T = any> {
 }
 
 export interface Graph extends Serializable<SerializedGraph> {
-    readonly id: string;
+    readonly id: Id;
     label: string;
     size: number;
-    getNode(id: string): Node | null;
-    getEdge(id: string): Edge | null;
+    addNode(node: Node): void;
+    hasNode(id: Id): boolean;
+    getNode(id: Id): Node;
+    deleteNode(id: Id): Node;
+    addEdge(edge: Edge): void;
+    getEdge(id: Id): Edge;
+    deleteEdge(id: Id): Edge;
     getIncomingEdges(node: Node): Edge[];
     getOutgoingEdges(node: Node): Edge[];
     iterNodes(): Iterable<Node>;
 }
 
-export type GraphConfig = Partial<Pick<Graph, 'label' | 'size'>>;
-
 export interface SerializedGraph {
-    id: string;
+    id: Id;
     size: number;
     label: string;
     nodes: Record<string, SerializedNode>;
@@ -164,26 +181,27 @@ export interface SerializedGraph {
 }
 
 export interface Node extends Serializable<SerializedNode> {
-    readonly id: string;
+    readonly id: Id;
     readonly label: string;
     outputs: Record<string, Texture>;
     getInput(name: string): IOType | null;
     getInputs(): Record<string, IOType>;
     getOutput(name: string): IOType | null;
     getOutputs(): Record<string, IOType>;
+    setProperty<T extends Value>(name: string, value: T): void;
     getProperty<T extends Value>(name: string): T | null;
     getProperties(): Record<string, Value>;
     execute(ctx: ExecutionContext): void | Promise<void>;
 }
 
 export interface SerializedNode {
-    id: string;
+    id: Id;
     descriptor: string;
     properties: Record<string, Value>;
 }
 
 export interface Edge extends Serializable<SerializedEdge> {
-    readonly id: string;
+    readonly id: Id;
     from: string;
     fromPort: string;
     to: string;
@@ -191,7 +209,7 @@ export interface Edge extends Serializable<SerializedEdge> {
 }
 
 export interface SerializedEdge {
-    id: string;
+    id: Id;
     from: string;
     fromPort: string;
     to: string;

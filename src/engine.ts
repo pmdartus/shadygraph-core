@@ -1,21 +1,59 @@
 import { createExecutionContext } from './context';
-import { GraphImpl } from './graph';
 import { NodeRegistry } from './registry';
 
-import type { Engine, EngineConfig } from './types';
+import type { Action, Engine, EngineConfig, Graph } from './types';
 
 export function createEngine(config: EngineConfig): Engine {
     const { backend } = config;
+
+    const graphs = new Map<string, Graph>();
     const registry = new NodeRegistry();
+
+    const undoStack: Action[] = [];
+    const redoStack: Action[] = [];
 
     return {
         backend,
         registry,
-        createGraph(config) {
-            return GraphImpl.create(config);
+        dispatch(action) {
+            action.execute(this);
+
+            undoStack.push(action);
+            redoStack.length = 0;
         },
-        loadGraph(data) {
-            return GraphImpl.fromJSON(data, { engine: this });
+        undo() {
+            const action = undoStack.pop();
+            if (!action) {
+                return false;
+            }
+
+            action.undo!(this);
+            redoStack.push(action);
+
+            return true;
+        },
+        addGraph(graph) {
+            if (graphs.has(graph.id)) {
+                throw new Error(`Graph with id ${graph.id} already exists.`);
+            }
+
+            graphs.set(graph.id, graph);
+        },
+        getGraph(id) {
+            const graph = graphs.get(id);
+            if (!graph) {
+                throw new Error(`Graph with id ${id} does not exist.`);
+            }
+
+            return graph;
+        },
+        getGraphs() {
+            return Object.fromEntries(graphs);
+        },
+        deleteGraph(id) {
+            const graph = this.getGraph(id);
+            graphs.delete(id);
+            return graph;
         },
         async renderGraph(graph) {
             for (const node of graph.iterNodes()) {

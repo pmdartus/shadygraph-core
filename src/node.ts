@@ -1,8 +1,9 @@
-import { createValue } from './value';
+import { assertValue, createValue } from './value';
 import { uuid } from './utils/uuid';
 
 import type {
     ExecutionContext,
+    Id,
     IOType,
     Node,
     NodeDescriptor,
@@ -12,14 +13,14 @@ import type {
 } from './types';
 
 interface NodeConfig {
-    id?: string;
+    id?: Id;
     descriptor: NodeDescriptor;
     properties?: Record<string, Value>;
     outputs?: Record<string, Texture>;
 }
 
 export class NodeImpl implements Node {
-    readonly id: string;
+    readonly id: Id;
     #descriptor: NodeDescriptor;
     #properties: Record<string, Value>;
     outputs: Record<string, Texture>;
@@ -51,6 +52,16 @@ export class NodeImpl implements Node {
         return this.#descriptor.outputs;
     }
 
+    setProperty<T extends Value>(name: string, value: T): void {
+        if (!Object.hasOwn(this.#descriptor.properties, name)) {
+            throw new Error(`Property ${name} does not exist.`);
+        }
+
+        const propertyDescriptor = this.#descriptor.properties[name];
+        assertValue(value, propertyDescriptor.type);
+
+        this.#properties[name] = value;
+    }
     getProperty<T extends Value>(name: string): T | null {
         if (!Object.hasOwn(this.#descriptor.properties, name)) {
             return null;

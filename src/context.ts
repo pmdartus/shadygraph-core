@@ -35,7 +35,7 @@ export function createExecutionContext({
             if (!inputEdge) {
                 return null;
             } else {
-                const fromNode = graph.getNode(inputEdge.from)!;
+                const fromNode = graph.getNode(inputEdge.from);
                 return fromNode.outputs[inputEdge.fromPort] ?? null;
             }
         },

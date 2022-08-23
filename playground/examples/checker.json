@@ -9,7 +9,7 @@
             "properties": {}
         },
         "Tiling_2": {
-            "id": "Default",
+            "id": "Tiling_2",
             "descriptor": "#checker",
             "properties": {
                 "tiling": {
@@ -19,7 +19,7 @@
             }
         },
         "Tiling_10": {
-            "id": "Default",
+            "id": "Tiling_10",
             "descriptor": "#checker",
             "properties": {
                 "tiling": {
