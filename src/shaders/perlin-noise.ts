@@ -4,10 +4,8 @@ import { noiseHelpers } from './shared/noise';
 import { createShaderDescriptor } from './shared/shader-descriptor';
 
 // https://en.wikipedia.org/wiki/Perlin_noise
-//
 const SOURCE = wgsl`
     ${noiseHelpers}
-
 
     fn run(coordinate: vec2<f32>) -> Output {
         var pos = coordinate * f32(config.scale);

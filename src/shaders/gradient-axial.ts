@@ -9,15 +9,6 @@ const SOURCE = wgsl`
         var v = config.point2 - config.point1;
 
         var value = dot(v, u) / length(v);
-
-        if (distance(coordinate, config.point1) < POINT_SIZE) {
-            return Output(vec4<f32>(0, 1, 0, 1.0));
-        }
-
-        if (distance(coordinate, config.point2) < POINT_SIZE) {
-            return Output(vec4<f32>(0, 0, 1, 1.0));
-        }
-        
         return Output(vec4<f32>(value, value, value, 1));
     }
 `;

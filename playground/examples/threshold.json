@@ -1,0 +1,60 @@
+{
+    "id": "threshold",
+    "label": "Threshold",
+    "size": 512,
+    "nodes": {
+        "Gradient": {
+            "id": "Gradient",
+            "descriptor": "#gradient-axial",
+            "properties": {}
+        },
+        "Default": {
+            "id": "Default",
+            "descriptor": "#threshold",
+            "properties": {}
+        },
+        "Value": {
+            "id": "Value",
+            "descriptor": "#threshold",
+            "properties": {
+                "value": {
+                    "type": "float1",
+                    "value": [0.8]
+                }
+            }
+        },
+        "Mode-lt": {
+            "id": "Mode-lt",
+            "descriptor": "#threshold",
+            "properties": {
+                "mode": {
+                    "type": "int1",
+                    "value": [3]
+                }
+            }
+        }
+    },
+    "edges": {
+        "Gradient_Default": {
+            "id": "Gradient_Default",
+            "from": "Gradient",
+            "fromPort": "output",
+            "to": "Default",
+            "toPort": "input"
+        },
+        "Gradient_Value": {
+            "id": "Gradient_Value",
+            "from": "Gradient",
+            "fromPort": "output",
+            "to": "Value",
+            "toPort": "input"
+        },
+        "Gradient_Mode-lt": {
+            "id": "Gradient_Mode-lt",
+            "from": "Gradient",
+            "fromPort": "output",
+            "to": "Mode-lt",
+            "toPort": "input"
+        }
+    }
+}

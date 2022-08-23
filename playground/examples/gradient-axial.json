@@ -5,13 +5,11 @@
     "nodes": {
         "A": {
             "id": "A",
-            "type": "shader",
             "descriptor": "#gradient-axial",
             "properties": {}
         },
         "B": {
             "id": "B",
-            "type": "shader",
             "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
@@ -26,7 +24,6 @@
         },
         "C": {
             "id": "C",
-            "type": "shader",
             "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
@@ -41,7 +38,6 @@
         },
         "D": {
             "id": "D",
-            "type": "shader",
             "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {
@@ -56,7 +52,6 @@
         },
         "E": {
             "id": "E",
-            "type": "shader",
             "descriptor": "#gradient-axial",
             "properties": {
                 "point1": {

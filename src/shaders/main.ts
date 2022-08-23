@@ -13,6 +13,7 @@ import MIRROR from './mirror';
 import RGBA_SPLIT from './rgba-split';
 import RGBA_MERGE from './rgba-merge';
 import SQUARE from './square';
+import THRESHOLD from './threshold';
 import TRANSFORM_2D from './transform-2d';
 import UNIFORM_COLOR from './uniform-color';
 import VALUE_NOISE from './value-noise';
@@ -35,6 +36,7 @@ export const descriptors = [
     RGBA_MERGE,
     MIRROR,
     SQUARE,
+    THRESHOLD,
     TRANSFORM_2D,
     UNIFORM_COLOR,
     VALUE_NOISE,
