@@ -41,8 +41,8 @@ export default createNodeDescriptor({
         },
     },
     async execute(ctx) {
-        const sourceValue = ctx.getProperty<StringValue>('source')!;
-        const bgColorValue = ctx.getProperty<Float4Value>('background')!;
+        const sourceValue = ctx.getProperty<StringValue>('source');
+        const bgColorValue = ctx.getProperty<Float4Value>('background');
 
         const texture = ctx.getOutput('output');
 

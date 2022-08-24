@@ -20,7 +20,7 @@ export default createNodeDescriptor({
         },
     },
     async execute(ctx) {
-        const sourceValue = ctx.getProperty<StringValue>('source')!;
+        const sourceValue = ctx.getProperty<StringValue>('source');
 
         const response = await fetch(sourceValue.value);
         if (!response.ok) {

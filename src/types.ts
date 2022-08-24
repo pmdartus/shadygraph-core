@@ -144,7 +144,7 @@ export interface ShaderNodeDescriptor extends Omit<NodeDescriptor, 'execute'> {
 export interface ExecutionContext {
     readonly graph: Graph;
     readonly backend: Backend;
-    getProperty<T extends Value>(name: string): T | null;
+    getProperty<T extends Value>(name: string): T;
     getProperties(): Record<string, Value>;
     getInput(name: string): Texture | null;
     getInputs(): Record<string, Texture | null>;
@@ -176,8 +176,8 @@ export interface SerializedGraph {
     id: Id;
     size: number;
     label: string;
-    nodes: Record<string, SerializedNode>;
-    edges: Record<string, SerializedEdge>;
+    nodes: Record<Id, SerializedNode>;
+    edges: Record<Id, SerializedEdge>;
 }
 
 export interface Node extends Serializable<SerializedNode> {
@@ -189,7 +189,7 @@ export interface Node extends Serializable<SerializedNode> {
     getOutput(name: string): IOType | null;
     getOutputs(): Record<string, IOType>;
     setProperty<T extends Value>(name: string, value: T): void;
-    getProperty<T extends Value>(name: string): T | null;
+    getProperty<T extends Value>(name: string): T;
     getProperties(): Record<string, Value>;
     execute(ctx: ExecutionContext): void | Promise<void>;
 }

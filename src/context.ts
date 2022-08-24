@@ -17,7 +17,7 @@ export function createExecutionContext({
         graph,
         backend,
 
-        getProperty<T extends Value>(name: string): T | null {
+        getProperty<T extends Value>(name: string): T {
             return node.getProperty<T>(name);
         },
         getProperties(): Record<string, Value> {

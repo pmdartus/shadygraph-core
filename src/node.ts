@@ -62,9 +62,9 @@ export class NodeImpl implements Node {
 
         this.#properties[name] = value;
     }
-    getProperty<T extends Value>(name: string): T | null {
+    getProperty<T extends Value>(name: string): T {
         if (!Object.hasOwn(this.#descriptor.properties, name)) {
-            return null;
+            throw new Error(`Property ${name} does not exist.`);
         }
 
         if (Object.hasOwn(this.#properties, name)) {

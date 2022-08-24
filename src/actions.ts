@@ -50,18 +50,15 @@ export function createNode(config: { graph: Id; descriptor: Id }): Action {
         label: 'Create Node',
         execute(engine) {
             const graph = engine.getGraph(config.graph);
-
             const descriptor = engine.registry.getNodeDescriptor(config.descriptor);
+
             node = new NodeImpl({ descriptor });
+
             graph.addNode(node);
         },
         undo(engine) {
             const graph = engine.getGraph(config.graph);
-
-            const deletedNode = graph.deleteNode(node!.id);
-            if (!deletedNode) {
-                throw new Error(`Node with id ${node!.id} does not exist.`);
-            }
+            graph.deleteNode(node!.id);
 
             node = undefined;
         },
@@ -143,17 +140,13 @@ export function createEdge(config: {
         label: 'Create Edge',
         execute(engine) {
             const graph = engine.getGraph(config.graph);
-
             edge = new EdgeImpl(config);
+
             graph.addEdge(edge);
         },
         undo(engine) {
             const graph = engine.getGraph(config.graph);
-
-            const deletedEdge = graph.deleteEdge(edge!.id);
-            if (!deletedEdge) {
-                throw new Error(`Edge with id ${edge!.id} does not exist.`);
-            }
+            graph.deleteEdge(edge!.id);
 
             edge = undefined;
         },
@@ -167,11 +160,7 @@ export function deleteEdge(config: { graph: Id; edge: Id }): Action {
         label: 'Delete Edge',
         execute(engine) {
             const graph = engine.getGraph(config.graph);
-
             const deletedEdge = graph.deleteEdge(config.edge);
-            if (!deletedEdge) {
-                throw new Error(`Edge with id ${config.edge} does not exist.`);
-            }
 
             edge = deletedEdge;
         },
