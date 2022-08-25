@@ -18,8 +18,10 @@ export function createEngine(config: EngineConfig): Engine {
         dispatch(action) {
             action.execute(this);
 
-            undoStack.push(action);
-            redoStack.length = 0;
+            if (action.undo) {
+                undoStack.push(action);
+                redoStack.length = 0;
+            }
         },
         undo() {
             const action = undoStack.pop();
@@ -30,6 +32,15 @@ export function createEngine(config: EngineConfig): Engine {
             action.undo!(this);
             redoStack.push(action);
 
+            return true;
+        },
+        redo() {
+            const action = redoStack.pop();
+            if (!action) {
+                return false;
+            }
+
+            this.dispatch(action);
             return true;
         },
         addGraph(graph) {

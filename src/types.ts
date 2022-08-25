@@ -121,6 +121,7 @@ export interface Engine {
     registry: Registry;
     dispatch(action: Action): void;
     undo(): boolean;
+    redo(): boolean;
     addGraph(graph: Graph): void;
     getGraph(id: Id): Graph;
     getGraphs(): Record<Id, Graph>;
