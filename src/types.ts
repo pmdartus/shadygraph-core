@@ -100,32 +100,28 @@ export interface Backend {
     waitUntilDone(): Promise<void>;
 }
 
-type DispatchContext = Engine;
-
-export interface Action {
-    label: string;
-    execute(ctx: DispatchContext): void;
-    undo?(ctx: DispatchContext): void;
-}
-
 export interface Registry {
     getNodeDescriptor(id: Id): NodeDescriptor;
 }
 
 export interface EngineConfig {
     backend: Backend;
+    registry?: Registry;
 }
 
 export interface Engine {
     backend: Backend;
     registry: Registry;
-    dispatch(action: Action): void;
-    undo(): boolean;
-    redo(): boolean;
-    addGraph(graph: Graph): void;
+    createGraph(options: { label?: string; size?: number }): Graph;
     getGraph(id: Id): Graph;
     getGraphs(): Record<Id, Graph>;
     deleteGraph(id: Id): Graph;
+    loadGraph(options: { data: SerializedGraph }): Graph;
+    createNode(options: { graph: Id; descriptor: Id }): Node;
+    setNodeProperty(options: { graph: Id; node: Id; name: string; value: Value }): Node;
+    deleteNode(options: { graph: Id; node: Id }): { node: Node; edges: Edge[] };
+    createEdge(options: { graph: Id; from: Id; fromPort: Id; to: Id; toPort: Id }): Edge;
+    deleteEdge(options: { graph: Id; edge: Id }): Edge;
     renderGraph(graph: Graph): Promise<void>;
 }
 

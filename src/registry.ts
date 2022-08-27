@@ -13,7 +13,7 @@ export class NodeRegistry implements Registry {
     getNodeDescriptor(id: Id): NodeDescriptor {
         const descriptor = this.#descriptors.get(id);
         if (!descriptor) {
-            throw new Error(`Unknown node: ${id}`);
+            throw new Error(`Unknown descriptor "${id}".`);
         }
 
         return descriptor;

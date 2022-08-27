@@ -7,6 +7,7 @@ import type {
     IOType,
     Node,
     NodeDescriptor,
+    PropertyType,
     SerializedNode,
     Texture,
     Value,
@@ -52,25 +53,27 @@ export class NodeImpl implements Node {
         return this.#descriptor.outputs;
     }
 
-    setProperty<T extends Value>(name: string, value: T): void {
-        if (!Object.hasOwn(this.#descriptor.properties, name)) {
-            throw new Error(`Property ${name} does not exist.`);
+    #getPropertyDescriptor(name: string): PropertyType {
+        const { properties } = this.#descriptor;
+        if (!Object.hasOwn(properties, name)) {
+            throw new Error(`Property with name ${name} does not exist on ${this.#descriptor.id}.`);
         }
 
-        const propertyDescriptor = this.#descriptor.properties[name];
+        return properties[name];
+    }
+
+    setProperty<T extends Value>(name: string, value: T): void {
+        const propertyDescriptor = this.#getPropertyDescriptor(name);
         assertValue(value, propertyDescriptor.type);
 
         this.#properties[name] = value;
     }
     getProperty<T extends Value>(name: string): T {
-        if (!Object.hasOwn(this.#descriptor.properties, name)) {
-            throw new Error(`Property ${name} does not exist.`);
-        }
+        const propertyDescriptor = this.#getPropertyDescriptor(name);
 
         if (Object.hasOwn(this.#properties, name)) {
             return this.#properties[name] as T;
         } else {
-            const propertyDescriptor = this.#descriptor.properties[name];
             return createValue<T>(propertyDescriptor.type, propertyDescriptor.default);
         }
     }
