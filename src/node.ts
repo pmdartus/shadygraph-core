@@ -25,6 +25,7 @@ export class NodeImpl implements Node {
     #descriptor: NodeDescriptor;
     #properties: Record<string, Value>;
     outputs: Record<string, Texture>;
+    isDirty = true;
 
     constructor(config: NodeConfig) {
         this.id = config.id ?? uuid();

@@ -189,6 +189,7 @@ export interface Node extends Serializable<SerializedNode> {
     readonly id: Id;
     readonly label: string;
     outputs: Record<string, Texture>;
+    isDirty: boolean;
     getInput(name: string): IOType | null;
     getInputs(): Record<string, IOType>;
     getOutput(name: string): IOType | null;

@@ -7,8 +7,10 @@ export class GraphImpl implements Graph {
     id: Id;
     size: number;
     label: string;
+
     #nodeMap = new Map<Id, Node>();
     #edgeMap = new Map<Id, Edge>();
+    #sortedNodesCache: Id[] | null = null;
 
     constructor(config: { id?: Id; size?: number; label?: string }) {
         this.id = config.id ?? uuid();
@@ -35,19 +37,22 @@ export class GraphImpl implements Graph {
         }
 
         this.#nodeMap.set(node.id, node);
+
+        this.#invalidateSortedNodes();
     }
 
     deleteNode(id: Id): Node {
         const node = this.getNode(id);
 
-        for (const edge of this.getOutgoingEdges(node)) {
-            this.#edgeMap.delete(edge.id);
-        }
-        for (const edge of this.getIncomingEdges(node)) {
-            this.#edgeMap.delete(edge.id);
+        if (this.getIncomingEdges(node).length > 0) {
+            throw new Error(`Cannot delete node ${id} because it has incoming edges.`);
+        } else if (this.getOutgoingEdges(node).length > 0) {
+            throw new Error(`Cannot delete node ${id} because it has outgoing edges.`);
         }
 
         this.#nodeMap.delete(id);
+
+        this.#invalidateSortedNodes();
 
         return node;
     }
@@ -72,11 +77,18 @@ export class GraphImpl implements Graph {
         }
 
         this.#edgeMap.set(edge.id, edge);
+
+        this.#invalidateSortedNodes();
+        this.#markNodeDirty(this.getNode(edge.to));
     }
 
     deleteEdge(id: Id): Edge {
         const edge = this.getEdge(id);
+
         this.#edgeMap.delete(id);
+
+        this.#invalidateSortedNodes();
+        this.#markNodeDirty(this.getNode(edge.to));
 
         return edge;
     }
@@ -90,28 +102,8 @@ export class GraphImpl implements Graph {
     }
 
     *iterNodes(): Iterable<Node> {
-        const inDegrees = new Map<Node, number>(
-            Array.from(this.#nodeMap.values()).map((node) => [node, 0]),
-        );
-
-        for (const edge of this.#edgeMap.values()) {
-            const toNode = this.getNode(edge.to);
-            inDegrees.set(toNode, inDegrees.get(toNode)! + 1);
-        }
-
-        while (inDegrees.size > 0) {
-            for (const [node, inDegree] of inDegrees.entries()) {
-                if (inDegree === 0) {
-                    inDegrees.delete(node);
-
-                    yield node;
-
-                    for (const edge of this.getOutgoingEdges(node)) {
-                        const toNode = this.getNode(edge.to);
-                        inDegrees.set(toNode, inDegrees.get(toNode)! - 1);
-                    }
-                }
-            }
+        for (const nodeId of this.#getSortedNodes()) {
+            yield this.getNode(nodeId);
         }
     }
 
@@ -132,5 +124,55 @@ export class GraphImpl implements Graph {
             nodes,
             edges,
         };
+    }
+
+    #invalidateSortedNodes(): void {
+        this.#sortedNodesCache = null;
+    }
+
+    #getSortedNodes(): Id[] {
+        if (this.#sortedNodesCache !== null) {
+            return this.#sortedNodesCache;
+        }
+
+        const inDegrees = new Map<Node, number>(
+            Array.from(this.#nodeMap.values()).map((node) => [node, 0]),
+        );
+
+        for (const edge of this.#edgeMap.values()) {
+            const toNode = this.getNode(edge.to);
+            inDegrees.set(toNode, inDegrees.get(toNode)! + 1);
+        }
+
+        const sortedNodeIds: Id[] = [];
+
+        while (inDegrees.size > 0) {
+            for (const [node, inDegree] of inDegrees.entries()) {
+                if (inDegree === 0) {
+                    inDegrees.delete(node);
+
+                    sortedNodeIds.push(node.id);
+
+                    for (const edge of this.getOutgoingEdges(node)) {
+                        const toNode = this.getNode(edge.to);
+                        inDegrees.set(toNode, inDegrees.get(toNode)! - 1);
+                    }
+                }
+            }
+        }
+
+        this.#sortedNodesCache = sortedNodeIds;
+        return sortedNodeIds;
+    }
+
+    #markNodeDirty(node: Node): void {
+        node.isDirty = true;
+
+        // TODO: Optimize not to mark all nodes dirty. This is a naive implementation.
+        // The traversal should stop once it reaches a node that is already dirty.
+        for (const edge of this.getOutgoingEdges(node)) {
+            const toNode = this.getNode(edge.to);
+            this.#markNodeDirty(toNode);
+        }
     }
 }

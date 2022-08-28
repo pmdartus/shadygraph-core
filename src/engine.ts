@@ -115,6 +115,7 @@ export function createEngine(config: EngineConfig): Engine {
         },
         createEdge(options) {
             const graph = this.getGraph(options.graph);
+
             const edge = new EdgeImpl(options);
             graph.addEdge(edge);
 
