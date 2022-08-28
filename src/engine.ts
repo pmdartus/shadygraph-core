@@ -4,11 +4,13 @@ import { GraphImpl } from './graph';
 import { NodeImpl } from './node';
 import { NodeRegistry } from './registry';
 
-import type { Engine, EngineConfig, Graph } from './types';
+import type { Engine, EngineConfig, Graph, Node, NodeReference } from './types';
 
 export function createEngine(config: EngineConfig): Engine {
     const { backend, registry = new NodeRegistry() } = config;
+
     const graphs = new Map<string, Graph>();
+    let activeNode: NodeReference | null = null;
 
     return {
         backend,
@@ -35,6 +37,11 @@ export function createEngine(config: EngineConfig): Engine {
         },
         deleteGraph(id) {
             const graph = this.getGraph(id);
+
+            if (activeNode?.graph === id) {
+                this.setActiveNode(null);
+            }
+
             graphs.delete(id);
             return graph;
         },
@@ -76,9 +83,12 @@ export function createEngine(config: EngineConfig): Engine {
 
             return node;
         },
-        setNodeProperty(options) {
+        getNode(options) {
             const graph = this.getGraph(options.graph);
-            const node = graph.getNode(options.node);
+            return graph.getNode(options.node);
+        },
+        setNodeProperty(options) {
+            const node = this.getNode(options);
             node.setProperty(options.name, options.value);
 
             return node;
@@ -88,6 +98,10 @@ export function createEngine(config: EngineConfig): Engine {
 
             const node = graph.getNode(options.node);
             const edges = [...graph.getIncomingEdges(node), ...graph.getOutgoingEdges(node)];
+
+            if (options.graph === activeNode?.graph && options.node === activeNode?.node) {
+                this.setActiveNode(null);
+            }
 
             for (const edge of edges) {
                 graph.deleteEdge(edge.id);
@@ -109,6 +123,20 @@ export function createEngine(config: EngineConfig): Engine {
         deleteEdge(options) {
             const graph = this.getGraph(options.graph);
             return graph.deleteEdge(options.edge);
+        },
+        setActiveNode(options) {
+            let node: Node | null = null;
+
+            if (options !== null) {
+                const graph = this.getGraph(options.graph);
+                node = graph.getNode(options.node);
+            }
+
+            activeNode = options;
+            return node;
+        },
+        getActiveNode() {
+            return activeNode !== null ? this.getNode(activeNode) : null;
         },
         async renderGraph(graph) {
             for (const node of graph.iterNodes()) {

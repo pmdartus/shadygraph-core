@@ -113,6 +113,17 @@ describe('deleteGraph', () => {
         expect(graph).toBe(deleteGraph);
         expect(() => engine.getGraph(graph.id)).toThrow();
     });
+
+    test('delete active node', () => {
+        const graph = engine.createGraph({ label: 'test' });
+        const node = engine.createNode({ graph: graph.id, descriptor: 'test' });
+
+        engine.setActiveNode({ graph: graph.id, node: node.id });
+        expect(engine.getActiveNode()).toBe(node);
+
+        engine.deleteGraph(graph.id);
+        expect(engine.getActiveNode()).toBeNull();
+    });
 });
 
 describe('createNode', () => {
@@ -244,5 +255,59 @@ describe('deleteNode', () => {
 
         expect(deletedItems.node).toBe(nodeB);
         expect(deletedItems.edges).toEqual([nodeAtoB, nodeBtoC]);
+    });
+
+    test('delete active node', () => {
+        const graph = engine.createGraph({ label: 'test' });
+        const node = engine.createNode({ graph: graph.id, descriptor: 'test' });
+
+        const nodeRef = { graph: graph.id, node: node.id };
+
+        engine.setActiveNode(nodeRef);
+        expect(engine.getActiveNode()).toBe(node);
+
+        engine.deleteNode(nodeRef);
+        expect(engine.getActiveNode()).toBeNull();
+    });
+});
+
+describe('setActiveNode', () => {
+    test('null', () => {
+        expect(engine.setActiveNode(null)).toBeNull();
+    });
+
+    test('with non-existing graph', () => {
+        expect(() => engine.setActiveNode({ graph: 'non-existing', node: 'test' })).toThrow(
+            /Graph with id non-existing does not exist/,
+        );
+    });
+
+    test('with non-existing node', () => {
+        const graph = engine.createGraph({ label: 'test' });
+        expect(() => engine.setActiveNode({ graph: graph.id, node: 'non-existing' })).toThrow(
+            /Node with id non-existing does not exist/,
+        );
+    });
+
+    test('with existing graph and node', () => {
+        const graph = engine.createGraph({ label: 'test' });
+        const node = engine.createNode({ graph: graph.id, descriptor: 'test' });
+
+        expect(engine.setActiveNode({ graph: graph.id, node: node.id })).toBe(node);
+    });
+});
+
+describe('getActiveNode', () => {
+    test('returns null by default', () => {
+        expect(engine.getActiveNode()).toBeNull();
+    });
+
+    test('returns active node', () => {
+        const graph = engine.createGraph({ label: 'test' });
+        const node = engine.createNode({ graph: graph.id, descriptor: 'test' });
+
+        engine.setActiveNode({ graph: graph.id, node: node.id });
+
+        expect(engine.getActiveNode()).toBe(node);
     });
 });

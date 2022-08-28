@@ -104,6 +104,11 @@ export interface Registry {
     getNodeDescriptor(id: Id): NodeDescriptor;
 }
 
+export interface NodeReference {
+    graph: Id;
+    node: Id;
+}
+
 export interface EngineConfig {
     backend: Backend;
     registry?: Registry;
@@ -118,10 +123,13 @@ export interface Engine {
     deleteGraph(id: Id): Graph;
     loadGraph(options: { data: SerializedGraph }): Graph;
     createNode(options: { graph: Id; descriptor: Id }): Node;
-    setNodeProperty(options: { graph: Id; node: Id; name: string; value: Value }): Node;
-    deleteNode(options: { graph: Id; node: Id }): { node: Node; edges: Edge[] };
+    getNode(options: NodeReference): Node;
+    setNodeProperty(options: NodeReference & { name: string; value: Value }): Node;
+    deleteNode(options: NodeReference): { node: Node; edges: Edge[] };
     createEdge(options: { graph: Id; from: Id; fromPort: Id; to: Id; toPort: Id }): Edge;
     deleteEdge(options: { graph: Id; edge: Id }): Edge;
+    setActiveNode(options: NodeReference | null): Node | null;
+    getActiveNode(): Node | null;
     renderGraph(graph: Graph): Promise<void>;
 }
 
