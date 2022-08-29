@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "composite": true,
+
         "target": "esnext",
         "outDir": "dist",
 
@@ -7,9 +9,8 @@
         "moduleResolution": "node",
 
         "strict": true,
-        "declaration": true,
+        "noEmit": true,
 
         "lib": ["esnext", "DOM"]
-    },
-    "include": ["src/**/*.ts", "typings/env.d.ts", "playground/**/*.ts"]
+    }
 }

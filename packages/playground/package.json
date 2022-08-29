@@ -1,0 +1,15 @@
+{
+    "name": "@shadygraph/playground",
+    "private": true,
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "tsc && vite preview"
+    },
+    "devDependencies": {
+        "@shadygraph/engine": "1.0.0"
+    }
+}

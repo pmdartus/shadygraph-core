@@ -1,4 +1,4 @@
-import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '../src/main';
+import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '@shadygraph/engine';
 
 const examples = import.meta.glob<SerializedGraph>('./examples/*.json', {
     as: 'json',

@@ -1,0 +1,19 @@
+{
+    "name": "@shadygraph/engine",
+    "private": true,
+    "version": "1.0.0",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc && vite build"
+    },
+    "exports": {
+        ".": {
+            "import": "./dist/shadygraph.mjs",
+            "require": "./dist/shadygraph.umd.js"
+        }
+    },
+    "devDependencies": {
+        "@types/offscreencanvas": "^2019.7.0",
+        "@webgpu/types": "^0.1.20"
+    }
+}
