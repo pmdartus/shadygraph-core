@@ -6,10 +6,10 @@
     "license": "MIT",
     "scripts": {
         "dev": "vite",
-        "build": "tsc && vite build",
+        "build": "tsc --build && vite build",
         "preview": "tsc && vite preview"
     },
-    "devDependencies": {
+    "dependencies": {
         "@shadygraph/engine": "1.0.0"
     }
 }

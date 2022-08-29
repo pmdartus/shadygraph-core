@@ -4,7 +4,18 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@shadygraph/engine": "1.0.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
     "devDependencies": {
-        "@shadygraph/engine": "1.0.0"
+        "@types/react": "^18.0.17",
+        "@types/react-dom": "^18.0.6"
     }
 }

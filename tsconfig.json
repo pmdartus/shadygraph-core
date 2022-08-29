@@ -1,15 +1,17 @@
 {
     "compilerOptions": {
-        "composite": true,
-
         "target": "esnext",
         "outDir": "dist",
 
         "module": "esnext",
         "moduleResolution": "node",
 
-        "strict": true,
         "noEmit": true,
+
+        "strict": true,
+
+        "isolatedModules": true,
+        "forceConsistentCasingInFileNames": true,
 
         "lib": ["esnext", "DOM"]
     }
