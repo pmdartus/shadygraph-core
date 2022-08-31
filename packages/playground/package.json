@@ -6,7 +6,7 @@
     "license": "MIT",
     "scripts": {
         "dev": "vite",
-        "build": "tsc --build && vite build",
+        "build": "tsc && vite build",
         "preview": "tsc && vite preview"
     },
     "dependencies": {

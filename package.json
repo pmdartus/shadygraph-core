@@ -8,7 +8,8 @@
         "lint": "eslint .",
         "format": "prettier --write --ignore-unknown .",
         "format:check": "prettier --check --ignore-unknown .",
-        "test": "vitest run"
+        "test": "vitest run",
+        "build": "npm run build --workspaces"
     },
     "keywords": [],
     "author": "Pierre-Marie Dartus <pm@dartus.fr>",
@@ -18,6 +19,8 @@
         "@typescript-eslint/parser": "^5.30.5",
         "@vitejs/plugin-react": "^2.0.1",
         "eslint": "^8.19.0",
+        "eslint-plugin-react": "^7.31.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
         "husky": "^8.0.1",
         "lint-staged": "^13.0.3",
         "prettier": "^2.7.1",

@@ -3,14 +3,13 @@
     "private": true,
     "version": "1.0.0",
     "license": "MIT",
+    "type": "module",
+    "main": "dist/main.js",
+    "typings": "dist/main.d.ts",
     "scripts": {
-        "build": "tsc && vite build"
-    },
-    "exports": {
-        ".": {
-            "import": "./dist/shadygraph.mjs",
-            "require": "./dist/shadygraph.umd.js"
-        }
+        "clean": "rm -rf dist/",
+        "build": "tsc",
+        "dev": "tsc --watch"
     },
     "devDependencies": {
         "@types/offscreencanvas": "^2019.7.0",

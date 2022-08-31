@@ -1,12 +1,7 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "composite": true
+        "noEmit": true
     },
-    "include": ["src/**/*.ts"],
-    "references": [
-        {
-            "path": "../engine"
-        }
-    ]
+    "include": ["src"]
 }

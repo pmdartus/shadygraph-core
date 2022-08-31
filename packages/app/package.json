@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
-        "preview": "vite preview"
+        "preview": "tsc && vite preview"
     },
     "dependencies": {
         "@shadygraph/engine": "1.0.0",
