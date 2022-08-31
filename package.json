@@ -8,19 +8,19 @@
         "lint": "eslint .",
         "format": "prettier --write --ignore-unknown .",
         "format:check": "prettier --check --ignore-unknown .",
-        "check": "tsc --noEmit",
-        "dev": "vite ./playground",
-        "test": "vitest run"
+        "test": "vitest run",
+        "build": "npm run build --workspaces"
     },
     "keywords": [],
     "author": "Pierre-Marie Dartus <pm@dartus.fr>",
     "license": "MIT",
     "devDependencies": {
-        "@types/offscreencanvas": "^2019.7.0",
         "@typescript-eslint/eslint-plugin": "^5.30.5",
         "@typescript-eslint/parser": "^5.30.5",
-        "@webgpu/types": "^0.1.20",
+        "@vitejs/plugin-react": "^2.0.1",
         "eslint": "^8.19.0",
+        "eslint-plugin-react": "^7.31.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
         "husky": "^8.0.1",
         "lint-staged": "^13.0.3",
         "prettier": "^2.7.1",
@@ -32,5 +32,10 @@
     "lint-staged": {
         "**/*": "prettier --write --ignore-unknown",
         "**/*.{ts,js}": "eslint"
-    }
+    },
+    "workspaces": [
+        "packages/engine",
+        "packages/app",
+        "packages/playground"
+    ]
 }

@@ -1,8 +1,7 @@
-import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '../src/main';
+import { WebGPUBackend, createEngine, Graph, SerializedGraph } from '@shadygraph/engine';
 
 const examples = import.meta.glob<SerializedGraph>('./examples/*.json', {
     as: 'json',
-    eager: true,
 });
 
 const select = document.querySelector('select')!;
@@ -16,7 +15,7 @@ const engine = createEngine({
 });
 
 async function renderExample(id: string) {
-    const data = examples[id];
+    const data = await examples[id]();
     const graph = engine.loadGraph({ data });
 
     console.log(`Loaded graph: ${id}`);
@@ -62,10 +61,13 @@ function createPreviewCanvas(target: HTMLElement): HTMLCanvasElement {
 }
 
 function setupSelectDropdown() {
-    for (const [key, value] of Object.entries(examples)) {
+    for (const key of Object.keys(examples)) {
         const option = document.createElement('option');
+
+        const fixtureName = key.replace('./examples/', '').replace('.json', '');
         option.value = key;
-        option.textContent = (value as any).label;
+        option.textContent = fixtureName;
+
         select.appendChild(option);
     }
     select.firstElementChild?.setAttribute('selected', '');

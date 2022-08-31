@@ -1,0 +1,21 @@
+{
+    "name": "@shadygraph/app",
+    "private": true,
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "tsc && vite preview"
+    },
+    "dependencies": {
+        "@shadygraph/engine": "1.0.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
+    },
+    "devDependencies": {
+        "@types/react": "^18.0.17",
+        "@types/react-dom": "^18.0.6"
+    }
+}

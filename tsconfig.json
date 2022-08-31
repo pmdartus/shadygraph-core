@@ -7,9 +7,10 @@
         "moduleResolution": "node",
 
         "strict": true,
-        "declaration": true,
+
+        "isolatedModules": true,
+        "forceConsistentCasingInFileNames": true,
 
         "lib": ["esnext", "DOM"]
-    },
-    "include": ["src/**/*.ts", "typings/env.d.ts", "playground/**/*.ts"]
+    }
 }
