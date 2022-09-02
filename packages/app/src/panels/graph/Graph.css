@@ -1,0 +1,12 @@
+.graph-container {
+    height: 100%;
+    width: 100%;
+}
+
+/* 
+  Removing React flow attribution since it's a non-commercial product.
+  More details here: https://reactflow.dev/docs/introduction/#attribution 
+*/
+.react-flow__attribution {
+    display: none;
+}

@@ -1,16 +1,39 @@
-import { useState } from 'react';
+import { Allotment } from 'allotment';
+
+import { Panel } from './components/Panel';
+import Graph from './panels/graph';
+
+import 'allotment/dist/style.css';
 
 function App() {
-    const [count, setCount] = useState(0);
-
     return (
-        <div className="App">
-            <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-            </div>
-            <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
-        </div>
+        <Allotment defaultSizes={[1, 3, 1]}>
+            <Allotment.Pane>
+                <Panel title="Explorer">TODO</Panel>
+            </Allotment.Pane>
+            <Allotment.Pane>
+                <Allotment vertical defaultSizes={[4, 3]}>
+                    <Allotment.Pane>
+                        <Panel title="Graph">
+                            <Graph />
+                        </Panel>
+                    </Allotment.Pane>
+                    <Allotment.Pane>
+                        <Allotment>
+                            <Allotment.Pane>
+                                <Panel title="3D preview">TODO</Panel>
+                            </Allotment.Pane>
+                            <Allotment.Pane>
+                                <Panel title="2D preview">TODO</Panel>
+                            </Allotment.Pane>
+                        </Allotment>
+                    </Allotment.Pane>
+                </Allotment>
+            </Allotment.Pane>
+            <Allotment.Pane>
+                <Panel title="Properties">TODO</Panel>
+            </Allotment.Pane>
+        </Allotment>
     );
 }
 
