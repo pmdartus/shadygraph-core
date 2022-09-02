@@ -6,7 +6,16 @@
     --bg-slate-800: #1e293b;
     --bg-slate-700: #334155;
     --bg-slate-600: #475569;
+    --bg-slate-200: #e2e8f0;
     --bg-slate-100: #f1f5f9;
+
+    --margin-xs: 2px;
+    --margin-s: 4px;
+
+    --padding-s: 4px;
+    --padding-m: 8px;
+
+    --border-radius-s: 2px;
 }
 
 body {

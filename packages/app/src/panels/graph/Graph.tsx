@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import ReactFlow, {
     getRectOfNodes,
     Background,
@@ -10,16 +10,34 @@ import ReactFlow, {
     applyNodeChanges,
     applyEdgeChanges,
     EdgeChange,
+    addEdge,
+    Connection,
 } from 'react-flow-renderer';
+
+import { Focus } from '../../icons/Focus';
+import { Magnet } from '../../icons/Magnet';
+import { MagnetOn } from '../../icons/MagnetOn';
+import { ResetZoom } from '../../icons/ResetZoom';
+import { ElbowConnector } from '../../icons/ElbowConnector';
+import { CurvedConnector } from '../../icons/CurvedConnector';
+import { TransitConnection } from '../../icons/TransitConnection';
+import { TransitConnectionHorizontal } from '../../icons/TransitConnectionHorizontal';
+
+import { ActionButton } from '../../components/ActionButton';
+import { ActionToggleButton } from '../../components/ActionToggleButton';
 
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
-import './Graph.css';
+import { ShaderNode } from './ShaderNode';
+import {
+    alignSelectedNodesHorizontally,
+    alignSelectedNodesVertically,
+    GRID_SIZE,
+    selectedNodes,
+    snapSelectedNodesToGrid,
+} from './graph-utils';
 
-interface FlowSelection {
-    nodes: Node[];
-    edges: Edge[];
-}
+import './Graph.css';
 
 const defaultNodes: Node[] = [
     {
@@ -94,6 +112,32 @@ const defaultNodes: Node[] = [
         data: { label: 'Another output node' },
         position: { x: 400, y: 450 },
     },
+    {
+        id: '8',
+        type: 'shader',
+        data: {
+            label: 'Another output node',
+            inputs: [{ id: 'input1', label: 'Input 1' }],
+            outputs: [
+                { id: 'output1', label: 'Output 1' },
+                { id: 'output2', label: 'Output 2' },
+            ],
+        },
+        position: { x: 0, y: 0 },
+    },
+    {
+        id: '9',
+        type: 'shader',
+        data: {
+            label: 'Another output node',
+            inputs: [{ id: 'input1', label: 'Input 1' }],
+            outputs: [
+                { id: 'output1', label: 'Output 1' },
+                { id: 'output2', label: 'Output 2' },
+            ],
+        },
+        position: { x: 400, y: 0 },
+    },
 ];
 
 const defaultEdges: Edge[] = [
@@ -107,7 +151,6 @@ const defaultEdges: Edge[] = [
 
 export function Graph() {
     const reactFlowInstanceRef = useRef<ReactFlowInstance>();
-    const flowSelectionRef = useRef<FlowSelection>();
 
     const [nodes, setNodes] = useState<Node[]>(defaultNodes);
     const [edges, setEdges] = useState<Edge[]>(defaultEdges);
@@ -115,22 +158,23 @@ export function Graph() {
     const [stepEdges, setStepEdges] = useState(false);
     const [snapToGrid, setSnapToGrid] = useState(false);
 
+    const nodeTypes = useMemo(() => ({ shader: ShaderNode }), []);
+
     // Setting default values for the graph container size to avoid warnings from React Flow.
     const { width = 300, height = 500, ref: containerRef } = useResizeObserver();
 
     const handleFocusSelection = () => {
         const reactFlowInstance = reactFlowInstanceRef.current;
-        const selectedNodes = flowSelectionRef.current?.nodes ?? [];
-
         if (!reactFlowInstance) {
             return;
         }
 
-        // TODO: Fix selection focus.
-        if (selectedNodes.length === 0) {
+        const selected = selectedNodes(reactFlowInstance.getNodes());
+
+        if (selected.length === 0) {
             reactFlowInstance.fitView();
         } else {
-            const bounds = getRectOfNodes(selectedNodes);
+            const bounds = getRectOfNodes(selected);
             reactFlowInstance.fitBounds(bounds);
         }
     };
@@ -144,53 +188,34 @@ export function Graph() {
     };
 
     const handleAlignHorizontally = () => {
-        if (!reactFlowInstanceRef.current) {
+        const nodes = reactFlowInstanceRef.current?.getNodes();
+        if (!nodes) {
             return;
         }
 
-        const selectedNodes = flowSelectionRef.current?.nodes ?? [];
-        if (selectedNodes.length === 0) {
-            return;
-        }
-
-        // TODO: Fix alignment by computing node center.
-        const yPosition =
-            selectedNodes.reduce((sum, node) => sum + node.position.y, 0) / selectedNodes.length;
-
-        setNodes((nodes) =>
-            nodes.map((node) => {
-                if (selectedNodes.some((n) => n.id === node.id)) {
-                    return { ...node, position: { ...node.position, y: yPosition } };
-                } else {
-                    return node;
-                }
-            }),
-        );
+        setNodes((nodes) => alignSelectedNodesHorizontally(nodes));
     };
 
     const handleAlignVertically = () => {
-        if (!reactFlowInstanceRef.current) {
+        const nodes = reactFlowInstanceRef.current?.getNodes();
+        if (!nodes) {
             return;
         }
 
-        const selectedNodes = flowSelectionRef.current?.nodes ?? [];
-        if (selectedNodes.length === 0) {
-            return;
+        setNodes((nodes) => alignSelectedNodesVertically(nodes));
+    };
+
+    const handleSnapToGrid = (enabled: boolean) => {
+        setSnapToGrid(enabled);
+
+        if (enabled) {
+            const nodes = reactFlowInstanceRef.current?.getNodes();
+            if (!nodes) {
+                return;
+            }
+
+            setNodes((nodes) => snapSelectedNodesToGrid(nodes));
         }
-
-        // TODO: Fix alignment by computing node center.
-        const xPosition =
-            selectedNodes.reduce((sum, node) => sum + node.position.x, 0) / selectedNodes.length;
-
-        setNodes((nodes) =>
-            nodes.map((node) => {
-                if (selectedNodes.some((n) => n.id === node.id)) {
-                    return { ...node, position: { ...node.position, x: xPosition } };
-                } else {
-                    return node;
-                }
-            }),
-        );
     };
 
     const handleNodeChange = (changes: NodeChange[]) => {
@@ -201,6 +226,10 @@ export function Graph() {
         setEdges((edges) => applyEdgeChanges(changes, edges));
     };
 
+    const handleConnect = (connection: Connection) => {
+        setEdges((edges) => addEdge(connection, edges));
+    };
+
     const styledEdges = edges.map((edge) => ({
         ...edge,
         type: stepEdges ? 'smoothstep' : 'default',
@@ -208,39 +237,48 @@ export function Graph() {
 
     return (
         <>
-            <button onClick={handleFocusSelection}>Focus selection</button>
-            <button onClick={handleResetZoom}>Reset zoom</button>
-            <button onClick={handleAlignHorizontally}>Align horizontally</button>
-            <button onClick={handleAlignVertically}>Align vertically</button>
-            <label>
-                Step edges
-                <input
-                    type="checkbox"
-                    checked={stepEdges}
-                    onChange={(evt) => setStepEdges(evt.target.checked)}
-                />
-            </label>
-            <label>
-                Snap to grid
-                <input
-                    type="checkbox"
-                    checked={snapToGrid}
-                    onChange={(evt) => setSnapToGrid(evt.target.checked)}
-                />
-            </label>
+            <ActionButton onClick={handleFocusSelection} title="Focus elements">
+                <Focus />
+            </ActionButton>
+            <ActionButton onClick={handleResetZoom} title="Reset zoom">
+                <ResetZoom />
+            </ActionButton>
+            <ActionButton onClick={handleAlignHorizontally} title="Align horizontally">
+                <TransitConnectionHorizontal />
+            </ActionButton>
+            <ActionButton onClick={handleAlignVertically} title="Align vertically">
+                <TransitConnection />
+            </ActionButton>
 
-            <div className="graph-container" ref={containerRef}>
+            <ActionToggleButton
+                pressed={stepEdges}
+                onPress={setStepEdges}
+                title="Toggle step edges"
+            >
+                {stepEdges ? <ElbowConnector /> : <CurvedConnector />}
+            </ActionToggleButton>
+            <ActionToggleButton
+                pressed={snapToGrid}
+                onPress={handleSnapToGrid}
+                title="Toggle snap nodes to grid"
+            >
+                {snapToGrid ? <MagnetOn /> : <Magnet />}
+            </ActionToggleButton>
+
+            <div ref={containerRef}>
                 <ReactFlow
-                    style={{ width, height }}
+                    nodeTypes={nodeTypes}
                     nodes={nodes}
                     edges={styledEdges}
                     snapToGrid={snapToGrid}
+                    snapGrid={[GRID_SIZE, GRID_SIZE]}
                     onInit={(instance) => (reactFlowInstanceRef.current = instance)}
-                    onSelectionChange={(elements) => (flowSelectionRef.current = elements)}
                     onNodesChange={handleNodeChange}
                     onEdgesChange={handleEdgeChange}
+                    onConnect={handleConnect}
+                    style={{ width, height }}
                 >
-                    <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+                    <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} size={1} />
                 </ReactFlow>
             </div>
         </>
