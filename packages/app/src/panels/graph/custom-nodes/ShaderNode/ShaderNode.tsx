@@ -1,6 +1,6 @@
 import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
-import './ShaderNode.css';
+// import './ShaderNode.css';
 
 interface NodeIO {
     id: string;
@@ -33,7 +33,7 @@ export function ShaderNode({ data }: NodeProps<NodeData>) {
                 );
             })}
 
-            <div className="shader-node__label">{data.label}</div>
+            <div className="sha">{data.label}</div>
             <div className="shader-node__preview"></div>
 
             {data.outputs.map((output, index) => {
