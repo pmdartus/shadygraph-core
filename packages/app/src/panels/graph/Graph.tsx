@@ -14,19 +14,19 @@ import ReactFlow, {
     Connection,
 } from 'react-flow-renderer';
 
-import Focus from '../../icons/Focus';
-import Magnet from '../../icons/Magnet';
-import MagnetOn from '../../icons/MagnetOn';
-import ResetZoom from '../../icons/ResetZoom';
-import ElbowConnector from '../../icons/ElbowConnector';
-import CurvedConnector from '../../icons/CurvedConnector';
-import TransitConnection from '../../icons/TransitConnection';
-import TransitConnectionHorizontal from '../../icons/TransitConnectionHorizontal';
+import Focus from '@/icons/Focus';
+import Magnet from '@/icons/Magnet';
+import MagnetOn from '@/icons/MagnetOn';
+import ResetZoom from '@/icons/ResetZoom';
+import ElbowConnector from '@/icons/ElbowConnector';
+import CurvedConnector from '@/icons/CurvedConnector';
+import TransitConnection from '@/icons/TransitConnection';
+import TransitConnectionHorizontal from '@/icons/TransitConnectionHorizontal';
 
-import { ActionButton } from '../../components/ActionButton';
-import { ActionToggleButton } from '../../components/ActionToggleButton';
+import { ActionButton } from '@/components/ActionButton';
+import { ActionToggleButton } from '@/components/ActionToggleButton';
 
-import { useResizeObserver } from '../../hooks/useResizeObserver';
+import { useResizeObserver } from '@/hooks/useResizeObserver';
 
 import { ShaderNode, ConnectorNode, CommentNode } from './custom-nodes';
 import {
