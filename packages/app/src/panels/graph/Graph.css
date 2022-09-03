@@ -1,7 +1,17 @@
+:root {
+    --graph-handle-size: 8px;
+}
+
 /* 
   Removing React flow attribution since it's a non-commercial product.
   More details here: https://reactflow.dev/docs/introduction/#attribution 
 */
 .react-flow__attribution {
     display: none;
+}
+
+.react-flow__handle {
+    width: var(--graph-handle-size);
+    height: var(--graph-handle-size);
+    border-width: 2px;
 }

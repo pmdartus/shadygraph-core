@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import ReactFlow, {
     getRectOfNodes,
     Background,
@@ -14,21 +14,21 @@ import ReactFlow, {
     Connection,
 } from 'react-flow-renderer';
 
-import { Focus } from '../../icons/Focus';
-import { Magnet } from '../../icons/Magnet';
-import { MagnetOn } from '../../icons/MagnetOn';
-import { ResetZoom } from '../../icons/ResetZoom';
-import { ElbowConnector } from '../../icons/ElbowConnector';
-import { CurvedConnector } from '../../icons/CurvedConnector';
-import { TransitConnection } from '../../icons/TransitConnection';
-import { TransitConnectionHorizontal } from '../../icons/TransitConnectionHorizontal';
+import Focus from '../../icons/Focus';
+import Magnet from '../../icons/Magnet';
+import MagnetOn from '../../icons/MagnetOn';
+import ResetZoom from '../../icons/ResetZoom';
+import ElbowConnector from '../../icons/ElbowConnector';
+import CurvedConnector from '../../icons/CurvedConnector';
+import TransitConnection from '../../icons/TransitConnection';
+import TransitConnectionHorizontal from '../../icons/TransitConnectionHorizontal';
 
 import { ActionButton } from '../../components/ActionButton';
 import { ActionToggleButton } from '../../components/ActionToggleButton';
 
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
-import { ShaderNode } from './ShaderNode';
+import { ShaderNode, ConnectorNode, CommentNode } from './custom-nodes';
 import {
     alignSelectedNodesHorizontally,
     alignSelectedNodesVertically,
@@ -38,6 +38,8 @@ import {
 } from './graph-utils';
 
 import './Graph.css';
+
+const nodeTypes = { shader: ShaderNode, comment: CommentNode, connector: ConnectorNode };
 
 const defaultNodes: Node[] = [
     {
@@ -138,6 +140,20 @@ const defaultNodes: Node[] = [
         },
         position: { x: 400, y: 0 },
     },
+    {
+        id: '10',
+        type: 'comment',
+        data: {
+            message: "Hello I am a comment node.\nI'm not connected to anything",
+        },
+        position: { x: 0, y: 200 },
+    },
+    {
+        id: '11',
+        type: 'connector',
+        data: {},
+        position: { x: 100, y: 400 },
+    },
 ];
 
 const defaultEdges: Edge[] = [
@@ -157,8 +173,6 @@ export function Graph() {
 
     const [stepEdges, setStepEdges] = useState(false);
     const [snapToGrid, setSnapToGrid] = useState(false);
-
-    const nodeTypes = useMemo(() => ({ shader: ShaderNode }), []);
 
     // Setting default values for the graph container size to avoid warnings from React Flow.
     const { width = 300, height = 500, ref: containerRef } = useResizeObserver();

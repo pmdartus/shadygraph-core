@@ -1,6 +1,6 @@
 import { SVGProps } from 'react';
 
-export function ElbowConnector(props: SVGProps<SVGSVGElement>) {
+export default function ElbowConnector(props: SVGProps<SVGSVGElement>) {
     return (
         <svg width="1em" height="1em" viewBox="0 0 15 15" {...props}>
             <path

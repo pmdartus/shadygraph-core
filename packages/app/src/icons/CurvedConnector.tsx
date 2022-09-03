@@ -1,6 +1,6 @@
 import { SVGProps } from 'react';
 
-export function CurvedConnector(props: SVGProps<SVGSVGElement>) {
+export default function CurvedConnector(props: SVGProps<SVGSVGElement>) {
     return (
         <svg width="1em" height="1em" viewBox="0 0 15 15" {...props}>
             <path

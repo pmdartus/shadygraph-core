@@ -1,7 +1,6 @@
 :root {
     --shader-node-size: 100px;
     --shader-label-height: 20px;
-    --shader-handle-size: 8px;
 }
 
 .react-flow__node-shader {
@@ -38,10 +37,4 @@
     width: 100%;
     height: 100%;
     background-color: black;
-}
-
-.react-flow__node-shader .react-flow__handle {
-    width: var(--shader-handle-size);
-    height: var(--shader-handle-size);
-    border-width: 2px;
 }

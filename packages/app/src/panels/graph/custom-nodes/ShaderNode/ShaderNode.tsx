@@ -2,16 +2,18 @@ import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
 import './ShaderNode.css';
 
-interface NodeData {
+interface NodeIO {
+    id: string;
+    label: string;
+}
+
+export interface NodeData {
     label: string;
     inputs: NodeIO[];
     outputs: NodeIO[];
 }
 
-interface NodeIO {
-    id: string;
-    label: string;
-}
+export type ShaderNodeProps = NodeProps<NodeData>;
 
 export function ShaderNode({ data }: NodeProps<NodeData>) {
     return (
