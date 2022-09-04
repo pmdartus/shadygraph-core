@@ -1,25 +1,25 @@
 import { Allotment } from 'allotment';
 
 import { Panel } from './components/Panel';
-import Graph from './panels/graph';
+import Graph from './panels/Graph';
 
 import 'allotment/dist/style.css';
 
 function App() {
     return (
-        <Allotment defaultSizes={[1, 3, 1]}>
+        <Allotment defaultSizes={[1, 3, 1]} separator={false}>
             <Allotment.Pane>
                 <Panel title="Explorer">TODO</Panel>
             </Allotment.Pane>
             <Allotment.Pane>
-                <Allotment vertical defaultSizes={[4, 3]}>
+                <Allotment vertical defaultSizes={[4, 3]} separator={false}>
                     <Allotment.Pane>
                         <Panel title="Graph">
                             <Graph />
                         </Panel>
                     </Allotment.Pane>
                     <Allotment.Pane>
-                        <Allotment>
+                        <Allotment separator={false}>
                             <Allotment.Pane>
                                 <Panel title="3D preview">TODO</Panel>
                             </Allotment.Pane>

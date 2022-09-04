@@ -1,7 +1,5 @@
 import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
-import './ShaderNode.css';
-
 interface NodeIO {
     id: string;
     label: string;
@@ -17,7 +15,7 @@ export type ShaderNodeProps = NodeProps<NodeData>;
 
 export function ShaderNode({ data }: NodeProps<NodeData>) {
     return (
-        <>
+        <div className="h-36 w-36 bg-black border-10 border-slate-700">
             {data.inputs.map((input, index) => {
                 const step = 100 / data.inputs.length;
                 const top = Math.round(index * step + step / 2);
@@ -33,8 +31,8 @@ export function ShaderNode({ data }: NodeProps<NodeData>) {
                 );
             })}
 
-            <div className="shader-node__label">{data.label}</div>
-            <div className="shader-node__preview"></div>
+            <div>{data.label}</div>
+            <div></div>
 
             {data.outputs.map((output, index) => {
                 const step = 100 / data.outputs.length;
@@ -50,6 +48,6 @@ export function ShaderNode({ data }: NodeProps<NodeData>) {
                     />
                 );
             })}
-        </>
+        </div>
     );
 }

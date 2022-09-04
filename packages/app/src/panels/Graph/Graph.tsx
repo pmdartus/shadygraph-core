@@ -28,7 +28,9 @@ import { ActionToggleButton } from '@/components/ActionToggleButton';
 
 import { useResizeObserver } from '@/hooks/useResizeObserver';
 
-import { ShaderNode, ConnectorNode, CommentNode } from './custom-nodes';
+import { CommentNode } from './custom-nodes/CommentNode';
+import { ConnectorNode } from './custom-nodes/ConnectorNode';
+import { ShaderNode } from './custom-nodes/ShaderNode';
 import {
     alignSelectedNodesHorizontally,
     alignSelectedNodesVertically,

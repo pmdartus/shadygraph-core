@@ -1,6 +1,0 @@
-.react-flow__node-connector {
-    width: calc(var(--graph-handle-size) * 3);
-    height: calc(var(--graph-handle-size) * 1.5);
-
-    background-color: var(--bg-slate-300);
-}

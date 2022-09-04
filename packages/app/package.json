@@ -12,12 +12,16 @@
     "dependencies": {
         "@shadygraph/engine": "1.0.0",
         "allotment": "^1.17.0",
+        "clsx": "^1.2.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-flow-renderer": "^10.3.16"
     },
     "devDependencies": {
         "@types/react": "^18.0.17",
-        "@types/react-dom": "^18.0.6"
+        "@types/react-dom": "^18.0.6",
+        "autoprefixer": "^10.4.8",
+        "postcss": "^8.4.16",
+        "tailwindcss": "^3.1.8"
     }
 }

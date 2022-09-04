@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren } from 'react';
+import { clsx } from 'clsx';
 
 import { ActionButton, ActionButtonProps } from './ActionButton';
 
@@ -8,10 +9,15 @@ export interface ActionToggleButtonProps extends Omit<ActionButtonProps, 'onClic
 }
 
 export const ActionToggleButton: FC<PropsWithChildren<ActionToggleButtonProps>> = (props) => {
-    const { pressed, onPress, children, ...rest } = props;
+    const { pressed, onPress, children, className, ...rest } = props;
 
     return (
-        <ActionButton aria-pressed={pressed} onClick={() => onPress(!pressed)} {...rest}>
+        <ActionButton
+            className={clsx(pressed && 'bg-slate-600', className)}
+            aria-pressed={pressed}
+            onClick={() => onPress(!pressed)}
+            {...rest}
+        >
             {children}
         </ActionButton>
     );
