@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    html {
+    }
+}
+
 /* Global overrides */
 html {
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 13px;
 }
 

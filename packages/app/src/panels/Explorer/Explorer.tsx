@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { clsx } from 'clsx';
+import { ListItem } from './ListItem';
 
-interface GraphItem {
+export interface GraphItem {
     id: string;
     label: string;
 }
@@ -22,22 +22,33 @@ const defaultItems: GraphItem[] = [
 ];
 
 export function Explorer() {
-    const [items] = useState(defaultItems);
+    const [items, setItems] = useState(defaultItems);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+
+    const handleRename = (id: string, name: string) => {
+        setItems(
+            items.map((item) => {
+                return item.id === id
+                    ? {
+                          ...item,
+                          label: name,
+                      }
+                    : item;
+            }),
+        );
+    };
 
     return (
         <ul role="listbox" tabIndex={0}>
             {items.map((item) => (
-                <li
-                    key={item.id}
-                    role="option"
-                    className={clsx(
-                        'px-2 py-1 cursor-pointer hover:bg-slate-700',
-                        item.id === selectedId && 'bg-slate-600',
-                    )}
-                    onClick={() => setSelectedId(item.id)}
-                >
-                    {item.label}
+                <li key={item.id} role="option">
+                    <ListItem
+                        key={item.id}
+                        item={item}
+                        selected={item.id === selectedId}
+                        onSelect={() => setSelectedId(item.id)}
+                        onRename={(name) => handleRename(item.id, name)}
+                    />
                 </li>
             ))}
         </ul>

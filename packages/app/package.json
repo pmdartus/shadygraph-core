@@ -10,6 +10,7 @@
         "preview": "tsc && vite preview"
     },
     "dependencies": {
+        "@fontsource/inter": "^4.5.12",
         "@shadygraph/engine": "1.0.0",
         "allotment": "^1.17.0",
         "clsx": "^1.2.1",
