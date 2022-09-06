@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { ListItem } from './ListItem';
 
 export interface GraphItem {
@@ -38,19 +39,26 @@ export function Explorer() {
         );
     };
 
+    const handleDelete = (id: string) => {
+        setItems(items.filter((item) => item.id !== id));
+    };
+
     return (
-        <ul role="listbox" tabIndex={0}>
-            {items.map((item) => (
-                <li key={item.id} role="option">
-                    <ListItem
-                        key={item.id}
-                        item={item}
-                        selected={item.id === selectedId}
-                        onSelect={() => setSelectedId(item.id)}
-                        onRename={(name) => handleRename(item.id, name)}
-                    />
-                </li>
-            ))}
-        </ul>
+        <>
+            <ul role="listbox" tabIndex={0}>
+                {items.map((item) => (
+                    <li key={item.id} role="option">
+                        <ListItem
+                            key={item.id}
+                            item={item}
+                            selected={item.id === selectedId}
+                            onSelect={() => setSelectedId(item.id)}
+                            onRename={(name) => handleRename(item.id, name)}
+                            onDelete={() => handleDelete(item.id)}
+                        />
+                    </li>
+                ))}
+            </ul>
+        </>
     );
 }
