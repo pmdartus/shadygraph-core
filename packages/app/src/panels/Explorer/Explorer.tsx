@@ -1,4 +1,10 @@
 import { useState } from 'react';
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from '@/components/ContextMenu';
 
 import { ListItem } from './ListItem';
 
@@ -43,22 +49,37 @@ export function Explorer() {
         setItems(items.filter((item) => item.id !== id));
     };
 
+    const handleCreate = () => {
+        setItems((items) => [
+            ...items,
+            {
+                id: `${items.length + 1}`,
+                label: 'New Item',
+            },
+        ]);
+    };
+
     return (
-        <>
-            <ul role="listbox" tabIndex={0}>
-                {items.map((item) => (
-                    <li key={item.id} role="option">
-                        <ListItem
-                            key={item.id}
-                            item={item}
-                            selected={item.id === selectedId}
-                            onSelect={() => setSelectedId(item.id)}
-                            onRename={(name) => handleRename(item.id, name)}
-                            onDelete={() => handleDelete(item.id)}
-                        />
-                    </li>
-                ))}
-            </ul>
-        </>
+        <ContextMenu>
+            <ContextMenuTrigger className="h-96 block">
+                <ul role="listbox" tabIndex={0}>
+                    {items.map((item) => (
+                        <li key={item.id} role="option">
+                            <ListItem
+                                key={item.id}
+                                item={item}
+                                selected={item.id === selectedId}
+                                onSelect={() => setSelectedId(item.id)}
+                                onRename={(name) => handleRename(item.id, name)}
+                                onDelete={() => handleDelete(item.id)}
+                            />
+                        </li>
+                    ))}
+                </ul>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuItem onSelect={handleCreate}>Create graph</ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
     );
 }

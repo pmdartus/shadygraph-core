@@ -1,60 +1,37 @@
-import { useEffect } from 'react';
+import clsx from 'clsx';
+import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 
-export interface ContextMenuAction {
-    id: string;
-    label: string;
-}
+export const ContextMenu = ContextMenuPrimitive.Root;
+export const ContextMenuTrigger = ContextMenuPrimitive.Trigger;
 
-export interface ContextMenuProps<Action extends ContextMenuAction> {
-    position?: { x: number; y: number };
-    actions: Action[];
-    onAction: (action: Action['id']) => void;
-    onClose: () => void;
-}
-
-export function ContextMenu<Action extends ContextMenuAction>(props: ContextMenuProps<Action>) {
-    const { position, actions, onAction, onClose } = props;
-
-    useEffect(() => {
-        const handleClick = () => {
-            onClose();
-        };
-
-        document.addEventListener('click', handleClick);
-        return () => {
-            document.removeEventListener('click', handleClick);
-        };
-    });
+export const ContextMenuContent = (props: ContextMenuPrimitive.ContextMenuContentProps) => {
+    const { className, ...contentProps } = props;
 
     return (
-        <div
-            className="absolute w-64 bg-slate-900 flex flex-col shadow-md py-2.5"
-            style={{
-                left: position?.x,
-                top: position?.y,
-            }}
-        >
-            {actions.map((action) => (
-                <ContextMenuItem key={action.id} action={action} onAction={onAction} />
-            ))}
-        </div>
+        <ContextMenuPrimitive.Portal>
+            <ContextMenuPrimitive.Content
+                className={clsx(
+                    'w-52 p-2 rounded-sm overflow-hidden bg-slate-900 shadow-md z-50',
+                    className,
+                )}
+                {...contentProps}
+            />
+        </ContextMenuPrimitive.Portal>
     );
-}
+};
 
-interface ContextMenuItemProps<Action extends ContextMenuAction> {
-    action: Action;
-    onAction: (action: Action['id']) => void;
-}
-
-function ContextMenuItem<Action extends ContextMenuAction>(props: ContextMenuItemProps<Action>) {
-    const { action, onAction } = props;
+export const ContextMenuItem = (props: ContextMenuPrimitive.ContextMenuItemProps) => {
+    const { className, ...itemProps } = props;
 
     return (
-        <button
-            className="w-full px-2.5 py-0.5 text-left hover:bg-blue-600"
-            onClick={() => onAction(action.id)}
-        >
-            {action.label}
-        </button>
+        <ContextMenuPrimitive.Item
+            className={clsx(
+                'px-2 py-1 rounded-sm select-none',
+                'focus:outline-none focus:ring-2 focus:ring-blue-600',
+                'radix-highlighted:bg-blue-800 radix-highlighted:text-white',
+                className,
+            )}
+            {...itemProps}
+        />
     );
-}
+};

@@ -1,4 +1,7 @@
 /* eslint-env node */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
+const radix = require('tailwindcss-radix');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -6,5 +9,5 @@ module.exports = {
     theme: {
         extend: {},
     },
-    plugins: [],
+    plugins: [radix],
 };

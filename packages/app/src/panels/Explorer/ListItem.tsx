@@ -1,7 +1,12 @@
-import { useState, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent, useRef, useLayoutEffect } from 'react';
 import { clsx } from 'clsx';
 
-import { ContextMenu } from '@/components/ContextMenu';
+import {
+    ContextMenu,
+    ContextMenuTrigger,
+    ContextMenuContent,
+    ContextMenuItem,
+} from '@/components/ContextMenu';
 
 import { GraphItem } from './Explorer';
 
@@ -31,11 +36,9 @@ const graphActions = [
 
 export function ListItem({ item, selected, onSelect, onRename, onDelete }: ListItemProps) {
     const [isEditing, setIsEditing] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
-    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-
-    const handleKeyDown = (evt: KeyboardEvent<HTMLInputElement>) => {
+    const handleInputKeyDown = (evt: KeyboardEvent<HTMLInputElement>) => {
         evt.stopPropagation();
 
         if (evt.key === 'Enter') {
@@ -46,12 +49,8 @@ export function ListItem({ item, selected, onSelect, onRename, onDelete }: ListI
         }
     };
 
-    const handleContextMenu = (evt: React.MouseEvent<HTMLDivElement>) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-
-        setIsContextMenuVisible(true);
-        setContextMenuPosition({ x: evt.pageX, y: evt.pageY });
+    const handleInputBlur = () => {
+        setIsEditing(false);
     };
 
     const handleAction = (action: GraphActionType) => {
@@ -65,39 +64,47 @@ export function ListItem({ item, selected, onSelect, onRename, onDelete }: ListI
         }
     };
 
+    useLayoutEffect(() => {
+        if (isEditing) {
+            // Hack: Adding a timeout to ensure that the input keeps the focus.
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 50);
+        }
+    }, [isEditing]);
+
     return (
-        <>
-            <div
-                className={clsx(
-                    'px-2 py-1 cursor-pointer border border-transparent',
-                    selected && 'bg-slate-600',
-                    !selected && 'hover:border-blue-600',
-                )}
-                onClick={() => onSelect?.()}
-                onDoubleClick={() => setIsEditing(true)}
-                onContextMenu={handleContextMenu}
-            >
-                {isEditing ? (
-                    <input
-                        type="text"
-                        className="bg-transparent"
-                        autoFocus
-                        defaultValue={item.label}
-                        onKeyDown={handleKeyDown}
-                        onBlur={() => setIsEditing(false)}
-                    />
-                ) : (
-                    item.label
-                )}
-            </div>
-            {isContextMenuVisible && (
-                <ContextMenu
-                    position={contextMenuPosition}
-                    actions={graphActions}
-                    onClose={() => setIsContextMenuVisible(false)}
-                    onAction={handleAction}
-                />
-            )}
-        </>
+        <ContextMenu>
+            <ContextMenuTrigger>
+                <div
+                    className={clsx(
+                        'px-2 py-1 cursor-pointer border-2 border-transparent hover:border-blue-600',
+                        selected && 'bg-blue-800',
+                    )}
+                    onClick={() => onSelect?.()}
+                    onDoubleClick={() => setIsEditing(true)}
+                >
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            className="bg-slate-800"
+                            ref={inputRef}
+                            defaultValue={item.label}
+                            onKeyDown={handleInputKeyDown}
+                            onBlur={handleInputBlur}
+                        />
+                    ) : (
+                        item.label
+                    )}
+                </div>
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                {graphActions.map((action) => (
+                    <ContextMenuItem key={action.id} onSelect={() => handleAction(action.id)}>
+                        {action.label}
+                    </ContextMenuItem>
+                ))}
+            </ContextMenuContent>
+        </ContextMenu>
     );
 }
