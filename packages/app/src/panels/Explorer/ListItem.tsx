@@ -12,14 +12,16 @@ import { GraphItem } from './Explorer';
 
 interface ListItemProps {
     item: GraphItem;
-    selected?: boolean;
-    onSelect?: () => void;
-    onRename?: (name: string) => void;
-    onDelete?: () => void;
+    selected: boolean;
+    onSelect(): void;
+    onRename(name: string): void;
+    onDuplicate(): void;
+    onDelete(): void;
 }
 
 enum GraphActionType {
     Rename = 'rename',
+    Duplicate = 'duplicate',
     Delete = 'delete',
 }
 
@@ -29,12 +31,23 @@ const graphActions = [
         label: 'Rename',
     },
     {
+        id: GraphActionType.Duplicate,
+        label: 'Duplicate',
+    },
+    {
         id: GraphActionType.Delete,
         label: 'Delete',
     },
 ];
 
-export function ListItem({ item, selected, onSelect, onRename, onDelete }: ListItemProps) {
+export function ListItem({
+    item,
+    selected,
+    onSelect,
+    onRename,
+    onDuplicate,
+    onDelete,
+}: ListItemProps) {
     const [isEditing, setIsEditing] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,6 +70,9 @@ export function ListItem({ item, selected, onSelect, onRename, onDelete }: ListI
         switch (action) {
             case GraphActionType.Rename:
                 setIsEditing(true);
+                break;
+            case GraphActionType.Duplicate:
+                onDuplicate?.();
                 break;
             case GraphActionType.Delete:
                 onDelete?.();
